@@ -14,7 +14,7 @@
 
 ;;;;;;;;;;;;;;;; switches for instrument-let ;;;;;;;;;;;;;;;;
 
-  (define instrument-let (make-parameter #f))
+  (define instrument-let (make-parameter #t))
 
   ;; say (instrument-let #t) to turn instrumentation on.
   ;;     (instrument-let #f) to turn it off again.
@@ -67,20 +67,22 @@
 ;;;             (value-of body
 ;;;               (extend-env id (newref val) env))))
 
-       (let-exp (var exp1 body)       
-	  (when (instrument-let)
-	    (eopl:printf "entering let ~s~%" var))
-          (let ((val (value-of exp1 env)))
-	    (let ((new-env (extend-env var (newref val) env)))
-	      (when (instrument-let)
-		(begin
-		  (eopl:printf "entering body of let ~s with env =~%" var)
-		  (pretty-print (env->list new-env))
-		  (eopl:printf "store =~%")
-		  (pretty-print (store->readable (get-store-as-list)))
-		  (eopl:printf "~%")
-		  ))
-	      (value-of body new-env))))
+;;; single assign
+;       (let-exp (var exp1 body)       
+;	  (when (instrument-let)
+;	    (eopl:printf "entering let ~s~%" var))
+;          (let ((val (value-of exp1 env)))
+;	    (let ((new-env (extend-env var (newref val) env)))
+;	      (when (instrument-let)
+;		(begin
+;		  (eopl:printf "entering body of let ~s with env =~%" var)
+;		  (pretty-print (env->list new-env))
+;		  (eopl:printf "store =~%")
+;		  (pretty-print (store->readable (get-store-as-list)))
+;		  (eopl:printf "~%")
+;		  ))
+;	      (value-of body new-env))))
+          
 
         (proc-exp (var body)
 	  (proc-val

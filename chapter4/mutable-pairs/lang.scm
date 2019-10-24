@@ -36,9 +36,13 @@
 
       (expression (identifier) var-exp)
 
+      ;(expression
+       ;("let" identifier "=" expression "in" expression)
+       ;let-exp)
+
       (expression
-       ("let" identifier "=" expression "in" expression)
-       let-exp)   
+       ("let" (arbno identifier "=" expression) "in" expression)
+       let-exp)
 
       (expression
        ("proc" "(" identifier ")" expression)
@@ -83,6 +87,9 @@
       (expression
         ("setright" expression "=" expression)
         setright-exp)
+
+      (expression
+       ("newarray" "(" expression, expression ")"
 
       ))
 
