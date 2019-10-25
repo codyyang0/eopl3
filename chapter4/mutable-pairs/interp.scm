@@ -9,6 +9,7 @@
   (require "environments.scm")
   (require "store.scm")
   (require "pairvals.scm")
+  (require "arrval.scm")
 
   (provide value-of-program value-of instrument-let instrument-newref)
 
@@ -16,8 +17,10 @@
 
   (define instrument-let (make-parameter #t))
 
+
   ;; say (instrument-let #t) to turn instrumentation on.
   ;;     (instrument-let #f) to turn it off again.
+
 
 ;;;;;;;;;;;;;;;; the interpreter ;;;;;;;;;;;;;;;;
 
@@ -82,7 +85,27 @@
 ;		  (eopl:printf "~%")
 ;		  ))
 ;	      (value-of body new-env))))
-          
+
+        (let-exp (vars exps body)
+          (letrec
+            ((extend-vars
+              (lambda (vs eps e)
+                (if (null? vs)
+                    e
+                    (let ((var (car vs))
+                          (exp (car eps)))
+                      ((when (instrument-let)
+                        (eopl:printf "let ~s~%" var))
+                       (let ((val (value-of exp env)))
+                         (let ((new-env (extend-env var val)))
+                           (when (instrument-let)
+                             (begin
+                               (eopl:printf "env =~%")
+                               (pretty-print (env->list new-env))
+                               (eopl:printf "store =~%")
+                               (pretty-print (store->readable (get-store-as-list)))
+                               (eopl:printf "~%")))))))))))
+            (value-of body (extend-vars vars exps env))))
 
         (proc-exp (var body)
 	  (proc-val
@@ -144,6 +167,23 @@
               (begin
                 (setright p v2)
                 (num-val 83)))))
+
+        (newarray-exp (exp1 exp2)
+          (let ((size (expval->num (value-of exp1 env)))
+                (val (value-of exp2 env)))
+            (arrval (make-arr size val))))
+
+        (arrayref-exp (exp1 exp2)
+          (let ((arr (expval->array (value-of exp1 env)))
+                (idx (expval->num (value-of exp2 env))))
+            (arraryref arr idx)))
+
+        (arrayset-exp (exp1 exp2 exp3)
+          (let ((arr (expval->array (value-of exp1 env)))
+                (idx (expval->num (value-of exp2 env)))
+                (val (value-of exp3 env)))
+            (arrayset arr idx val)))
+        
         )))
 
   ;; apply-procedure : Proc * ExpVal -> ExpVal

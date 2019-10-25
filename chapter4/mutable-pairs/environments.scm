@@ -5,7 +5,6 @@
   (provide init-env empty-env extend-env apply-env)
 
 ;;;;;;;;;;;;;;;; initial environment ;;;;;;;;;;;;;;;;
-  
   ;; init-env : () -> environment
 
   ;; (init-env) builds an environment in which i is bound to the

@@ -4,7 +4,7 @@
   (require "store.scm")                 ; for reference?
 
   (require "pairvals.scm")
-
+  (require "arrval.scm")
   (provide (all-defined-out))               ; too many things to list
 
 ;;;;;;;;;;;;;;;; expressed values ;;;;;;;;;;;;;;;;
@@ -23,6 +23,8 @@
       (ref reference?))
     (mutpair-val
       (p mutpair?))
+    (array-val
+     (arr arrval?))
     )
 
 ;;; extractors:
@@ -56,6 +58,12 @@
       (cases expval v
 	(mutpair-val (ref) ref)
 	(else (expval-extractor-error 'mutable-pair v)))))
+
+  (define expval->array
+    (lambda (v)
+      (cases expval v
+        (mutpair-val (ref) ref)
+        (else (expval-extractor-error 'array v)))))
 
   (define expval-extractor-error
     (lambda (variant value)
