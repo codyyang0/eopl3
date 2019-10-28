@@ -2,10 +2,9 @@
 
   (require "lang.scm")                  ; for expression?
   (require "store.scm")                 ; for reference?
-
   (require "pairvals.scm")
   (require "arrval.scm")
-  (provide (all-defined-out))               ; too many things to list
+  (provide (all-defined-out))           ; too many things to list
 
 ;;;;;;;;;;;;;;;; expressed values ;;;;;;;;;;;;;;;;
 
@@ -24,7 +23,7 @@
     (mutpair-val
       (p mutpair?))
     (array-val
-     (arr arrval?))
+     (arr array?))
     )
 
 ;;; extractors:
@@ -62,7 +61,7 @@
   (define expval->array
     (lambda (v)
       (cases expval v
-        (mutpair-val (ref) ref)
+        (array-val (ref) ref)
         (else (expval-extractor-error 'array v)))))
 
   (define expval-extractor-error
@@ -84,7 +83,7 @@
     (empty-env)
     (extend-env 
       (bvar symbol?)
-      (bval reference?)                 ; new for implicit-refs
+      (bval reference?) ; new for implicit-refs
       (saved-env environment?))
     (extend-env-rec*
       (proc-names (list-of symbol?))

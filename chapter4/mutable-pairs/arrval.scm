@@ -6,8 +6,7 @@
   (provide (all-defined-out))
 
   ;;;;;; ArrVal ;;;;;;;;;;;;;;;;;
-
-  (define arrval?
+  (define array?
     (lambda (v)
       (reference? v)))
 
@@ -15,11 +14,13 @@
     (lambda (size val)
       (letrec
         ((extend-arr
-          (lambda (n val)
-            (if (= (n 0))
-                ref1
-                (newref val)))))
-        (extend-arr (- n 1) val))))
+          (lambda (n val ref)
+            (if (eqv? n 0)
+                ref
+                (begin
+                  (newref val)
+                  (extend-arr (- n 1) val ref))))))
+        (extend-arr (- size 1) val (newref val)))))
 
   (define arraryref
     (lambda (arr idx)

@@ -8,7 +8,6 @@
   (require "lang.scm")             ; for scan&parse
   (require "interp.scm")           ; for value-of-program
   (require "tests.scm")            ; for test-list
-  
   (provide run run-all)
 
    ;;; interface for book test ;;;
@@ -19,7 +18,7 @@
   ;;;;;;;;;;;;;;;; interface to test harness ;;;;;;;;;;;;;;;;
   
   ;; run : String -> ExpVal
-
+  
   (define run
     (lambda (string)
       (value-of-program (scan&parse string))))

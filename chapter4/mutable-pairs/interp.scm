@@ -1,9 +1,7 @@
 (module interp (lib "eopl.ss" "eopl")
   
   ;; interpreter for the MUTABLE-PAIRS language
-
   (require "drscheme-init.scm")
-
   (require "lang.scm")
   (require "data-structures.scm")
   (require "environments.scm")
@@ -16,7 +14,6 @@
 ;;;;;;;;;;;;;;;; switches for instrument-let ;;;;;;;;;;;;;;;;
 
   (define instrument-let (make-parameter #t))
-
 
   ;; say (instrument-let #t) to turn instrumentation on.
   ;;     (instrument-let #f) to turn it off again.
@@ -94,17 +91,18 @@
                     e
                     (let ((var (car vs))
                           (exp (car eps)))
-                      ((when (instrument-let)
+                      (when (instrument-let)
                         (eopl:printf "let ~s~%" var))
-                       (let ((val (value-of exp env)))
-                         (let ((new-env (extend-env var val)))
-                           (when (instrument-let)
-                             (begin
-                               (eopl:printf "env =~%")
-                               (pretty-print (env->list new-env))
-                               (eopl:printf "store =~%")
-                               (pretty-print (store->readable (get-store-as-list)))
-                               (eopl:printf "~%")))))))))))
+                      (let ((val (value-of exp env)))
+                        (let ((new-env (extend-env var (newref val) e)))
+                          (when (instrument-let)
+                            (begin
+                              (eopl:printf "env =~%")
+                              (pretty-print (env->list new-env))
+                              (eopl:printf "store =~%")
+                              (pretty-print (store->readable (get-store-as-list)))
+                              (eopl:printf "~%")))
+                          (extend-vars (cdr vs) (cdr eps) new-env))))))))
             (value-of body (extend-vars vars exps env))))
 
         (proc-exp (var body)
@@ -171,7 +169,7 @@
         (newarray-exp (exp1 exp2)
           (let ((size (expval->num (value-of exp1 env)))
                 (val (value-of exp2 env)))
-            (arrval (make-arr size val))))
+            (array-val (make-arr size val))))
 
         (arrayref-exp (exp1 exp2)
           (let ((arr (expval->array (value-of exp1 env)))
