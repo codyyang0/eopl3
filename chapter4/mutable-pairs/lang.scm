@@ -100,6 +100,10 @@
        ("arrayset" "(" expression "," expression "," expression ")")
        arrayset-exp)
 
+      (expression
+       ("arraylength" "(" expression ")")
+       arraylength-exp)
+
       ))
 
   ;;;;;;;;;;;;;;;; sllgen boilerplate ;;;;;;;;;;;;;;;;

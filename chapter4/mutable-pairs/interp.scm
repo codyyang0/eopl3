@@ -13,7 +13,7 @@
 
 ;;;;;;;;;;;;;;;; switches for instrument-let ;;;;;;;;;;;;;;;;
 
-  (define instrument-let (make-parameter #t))
+  (define instrument-let (make-parameter #f))
 
   ;; say (instrument-let #t) to turn instrumentation on.
   ;;     (instrument-let #f) to turn it off again.
@@ -181,7 +181,10 @@
                 (idx (expval->num (value-of exp2 env)))
                 (val (value-of exp3 env)))
             (arrayset arr idx val)))
-        
+
+        (arraylength-exp (exp1)
+          (let ((arr (expval->array (value-of exp1 env))))
+            (num-val (arraylength arr))))
         )))
 
   ;; apply-procedure : Proc * ExpVal -> ExpVal
