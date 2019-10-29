@@ -32,6 +32,12 @@
 	  (if (eqv? search-sym bvar)
 	    bval
 	    (apply-env saved-env search-sym)))
+        (extend-env* (bvars bvals saved-env)
+          (cond
+            ((location search-sym bvars)
+             => (lambda (n)
+                  (list-ref bvals n)))
+            (else (apply-env saved-env search-sym))))
         (extend-env-rec* (p-names b-vars p-bodies saved-env)
           (cond 
             ((location search-sym p-names)

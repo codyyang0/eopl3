@@ -68,7 +68,7 @@
 
   (define-datatype proc proc?
     (procedure
-      (bvar symbol?)
+      (bvars (list-of symbol?))
       (body expression?)
       (env environment?)))
   
@@ -79,6 +79,10 @@
     (extend-env 
       (bvar symbol?)
       (bval reference?)                 
+      (saved-env environment?))
+    (extend-env*
+      (bvars (list-of symbol?))
+      (bvals (list-of reference?))
       (saved-env environment?))
     (extend-env-rec*
       (proc-names (list-of symbol?))
@@ -97,6 +101,13 @@
 	    (list sym val)              ; val is a denoted value-- a
                                         ; reference. 
 	    (env->list saved-env)))
+        (extend-env* (syms vals saved-env)
+          (append
+           (map (lambda (sym val)
+                  (list sym val))
+                syms
+                vals)
+           (env->list saved-env)))
 	(extend-env-rec* (p-names b-vars p-bodies saved-env)
 	  (cons
 	    (list 'letrec p-names '...)
