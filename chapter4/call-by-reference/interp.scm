@@ -183,13 +183,29 @@
   ;; otherwise, evaluate the expression and pass a reference to a new
   ;; cell. 
 
+;  (define value-of-operand
+;    (lambda (exp env)
+;      (cases expression exp
+;        (var-exp (var) (apply-env env var))
+;        (else
+;          (newref (value-of exp env))))))
+
+
+  ;; value-of-rand : Exp * Env -> Ref
+  ;; Page 133: Exercise 4.33
   (define value-of-operand
     (lambda (exp env)
       (cases expression exp
-        (var-exp (var) (apply-env env var)) 
+        (var-exp (var)
+          (let* ((ref (apply-env env var))
+                (val (deref ref)))
+            (cases expval val
+              (num-val (num) (newref val))
+              (bool-val (b) (newref val))
+              (else ref))))
         (else
-          (newref (value-of exp env))))))
-    
+         (newref (value-of exp env))))))
+
   ;; store->readable : Listof(List(Ref,Expval)) 
   ;;                    -> Listof(List(Ref,Something-Readable))
   (define store->readable
