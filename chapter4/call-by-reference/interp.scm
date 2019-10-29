@@ -84,6 +84,26 @@
 		  ))
 	      (value-of body new-env))))
 
+
+        ;; Page 133 Exercise 4.34
+        (letref-exp (var exp1 body)
+          (when (instrument-let)
+            (eopl:printf "entering let ~s~%" var))
+          (cases expression exp1
+            (var-exp (v)
+              (let ((new-env (extend-env var (apply-env env v) env)))
+                (when (instrument-let)
+                  (begin
+                    (eopl:printf "entering body of let ~s with env =~%" var)
+                    (pretty-print (env->list new-env))
+                    (eopl:printf "store =~%")
+                    (pretty-print (store->readable (get-store-as-list)))
+                    (eopl:printf "~%")
+                    ))
+                (value-of body new-env)))
+            (else
+             (value-of (let-exp var exp1 body) env))))
+
         (proc-exp (vars body)
 	  (proc-val
 	    (procedure vars body env)))
