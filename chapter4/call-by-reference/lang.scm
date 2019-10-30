@@ -45,6 +45,18 @@
        letref-exp)
 
       (expression
+       ("ref" identifier)
+       ref-exp)
+
+      (expression
+       ("deref" "(" identifier ")")
+       deref-exp)
+
+      (expression
+       ("setref" "(" identifier "," expression ")" )
+       setref-exp)
+
+      (expression
        ("proc" "(" (arbno identifier ) ")" expression)
        proc-exp)
 

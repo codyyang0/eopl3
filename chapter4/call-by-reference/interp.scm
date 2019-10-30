@@ -14,7 +14,7 @@
 
 ;;;;;;;;;;;;;;;; switches for instrument-let ;;;;;;;;;;;;;;;;
 
-  (define instrument-let (make-parameter #f))
+  (define instrument-let (make-parameter #t))
 
   ;; say (instrument-let #t) to turn instrumentation on.
   ;;     (instrument-let #f) to turn it off again.
@@ -104,6 +104,18 @@
             (else
              (value-of (let-exp var exp1 body) env))))
 
+        ;; Page 133 Exercise 4.35
+        (ref-exp (var)
+          (apply-env env var))
+
+        (deref-exp (var)
+          (deref (apply-env env var)))
+
+        (setref-exp (var expression)
+          (setref!
+           (apply-env env var)
+           (value-of expression env)))
+        
         (proc-exp (vars body)
 	  (proc-val
 	    (procedure vars body env)))
@@ -211,20 +223,29 @@
 ;          (newref (value-of exp env))))))
 
 
-  ;; value-of-rand : Exp * Env -> Ref
-  ;; Page 133: Exercise 4.33
+  ; Exercise 4.35, if the expression is ref-exp, then pass it
   (define value-of-operand
     (lambda (exp env)
       (cases expression exp
-        (var-exp (var)
-          (let* ((ref (apply-env env var))
-                (val (deref ref)))
-            (cases expval val
-              (num-val (num) (newref val))
-              (bool-val (b) (newref val))
-              (else ref))))
+        (var-exp (var) (apply-env env var))
+        (ref-exp (var) (apply-env env var))
         (else
-         (newref (value-of exp env))))))
+          (newref (value-of exp env))))))
+
+  ;; value-of-rand : Exp * Env -> Ref
+  ;; Page 133: Exercise 4.33
+;  (define value-of-operand
+;    (lambda (exp env)
+;      (cases expression exp
+;        (var-exp (var)
+;          (let* ((ref (apply-env env var))
+;                (val (deref ref)))
+;            (cases expval val
+;              (num-val (num) (newref val))
+;              (bool-val (b) (newref val))
+;              (else ref))))
+;        (else
+;         (newref (value-of exp env))))))
 
   ;; store->readable : Listof(List(Ref,Expval)) 
   ;;                    -> Listof(List(Ref,Something-Readable))
