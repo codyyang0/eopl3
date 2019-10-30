@@ -124,7 +124,22 @@
         (call-exp (rator rands)
           (let ((proc (expval->proc (value-of rator env)))
                 (args (map (lambda (rand) (value-of-operand rand env)) rands)))
-            (apply-procedure proc args)))
+            (begin
+              (apply-procedure proc args)
+              (for-each
+               (lambda (a-param n-param)
+                 (cases expression a-param
+                   (var-exp (var)
+                     (setref! (apply-env env var)
+                              (deref n-param)))
+                   (else
+                    (eopl:error 'call-exp "Actual params must be a vairable"))))
+               rands args))))
+
+;         (call-exp (rator rands)
+;          (let ((proc (expval->proc (value-of rator env)))
+;                (args (map (lambda (rand) (value-of-operand rand env)) rands)))
+;            (apply-procedure proc args)))
 
         (letrec-exp (p-names b-vars p-bodies letrec-body)
           (value-of letrec-body
@@ -245,16 +260,21 @@
 
   ; value-of-rand : Exp * Env -> Ref
   ; Exercise 4.35, if the expression is ref-exp, then pass it
+;  (define value-of-operand
+;    (lambda (exp env)
+;      (cases expression exp
+;        (var-exp (var) (apply-env env var))
+;        (ref-exp (var) (apply-env env var))
+;        (arrayref-exp (arr idx)
+;          (+ (start-idx (expval->array (value-of arr env)))
+;             (expval->num (value-of idx env))))
+;        (else
+;          (newref (value-of exp env))))))
+
+  ; Exercise 4.37 Call-by-value-result
   (define value-of-operand
-    (lambda (exp env)
-      (cases expression exp
-        (var-exp (var) (apply-env env var))
-        (ref-exp (var) (apply-env env var))
-        (arrayref-exp (arr idx)
-          (+ (start-idx (expval->array (value-of arr env)))
-             (expval->num (value-of idx env))))
-        (else
-          (newref (value-of exp env))))))
+    (lambda (var-exp env)
+      (newref (value-of var-exp env))))
 
   ;; value-of-rand : Exp * Env -> Ref
   ;; Page 133: Exercise 4.33
