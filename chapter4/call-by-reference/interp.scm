@@ -9,6 +9,7 @@
   (require "environments.scm")
   (require "store.scm")
   (require "pairvals.scm")
+  (require "arrval.scm")
 
   (provide value-of-program value-of instrument-let instrument-newref)
 
@@ -177,6 +178,26 @@
                 (setright p v2)
                 (num-val 83)))))
 
+        (newarray-exp (exp1 exp2)
+          (let ((size (expval->num (value-of exp1 env)))
+                (val (value-of exp2 env)))
+            (array-val (make-arr size val))))
+
+        (arrayref-exp (exp1 exp2)
+          (let ((arr (expval->array (value-of exp1 env)))
+                (idx (expval->num (value-of exp2 env))))
+            (arraryref arr idx)))
+
+        (arrayset-exp (exp1 exp2 exp3)
+          (let ((arr (expval->array (value-of exp1 env)))
+                (idx (expval->num (value-of exp2 env)))
+                (val (value-of exp3 env)))
+            (arrayset arr idx val)))
+
+        (arraylength-exp (exp1)
+          (let ((arr (expval->array (value-of exp1 env))))
+            (num-val (arraylength arr))))
+
         )))
 
   ;; apply-procedure : Proc * Ref -> ExpVal
@@ -222,13 +243,16 @@
 ;        (else
 ;          (newref (value-of exp env))))))
 
-
+  ; value-of-rand : Exp * Env -> Ref
   ; Exercise 4.35, if the expression is ref-exp, then pass it
   (define value-of-operand
     (lambda (exp env)
       (cases expression exp
         (var-exp (var) (apply-env env var))
         (ref-exp (var) (apply-env env var))
+        (arrayref-exp (arr idx)
+          (+ (start-idx (expval->array (value-of arr env)))
+             (expval->num (value-of idx env))))
         (else
           (newref (value-of exp env))))))
 
