@@ -158,7 +158,7 @@
   (define let3-exp-cont
     (lambda (var1 var2 var3 exp2 exp3 body env cont)
       (lambda (val1)
-        (value-of/k (let2-exp var2 exp2 var3 var3 body) (extend-env var1 val1 env) cont))))
+        (value-of/k (let2-exp var2 exp2 var3 exp3 body) (extend-env var1 val1 env) cont))))
   
   ; if-test-cont: Exp * Exp * Env * Cont -> Cont
   (define if-test-cont
@@ -180,18 +180,22 @@
                     (num-val (- (expval->num val1)
                                 (expval->num val2)))))))
 
+;  (define rator-cont
+;    (lambda (rand env cont)
+;      (lambda (val)
+;        (let ((proc1 (expval->proc val)))
+;          (apply-cont (rand-cont proc1 env cont)
+;                      (value-of/k rand env cont))))))
+
   (define rator-cont
-    (lambda (exp env cont)
+    (lambda (rand env cont)
       (lambda (val)
-        (let ((proc1 (expval->proc val)))
-          (apply-cont (rand-cont proc1 env cont)
-                      (value-of/k exp env cont))))))
+        (value-of/k rand env (rand-cont val cont)))))
 
   (define rand-cont
-    (lambda (proc1 env cont)
+    (lambda (rator cont)
       (lambda (val)
-        (apply-procedure/k proc1 val cont))))
-  
+        (apply-procedure/k (expval->proc rator) val cont))))
   )
   
 
