@@ -14,7 +14,12 @@
     (bool-val
       (boolean boolean?))
     (proc-val 
-      (proc proc?)))
+      (proc proc?))
+    (cons-val
+     (val1 expval?)
+     (val2 expval?))
+    (emptylist-val)
+    )
 
 ;;; extractors:
 
@@ -97,4 +102,27 @@
       (p-body expression?)
       (saved-env environment?)))
 
+
+;;;;;;;;;;;; cons ;;;;;;;;;;;;;;;;
+
+  (define cons-car
+    (lambda (pair)
+      (cases expval pair
+        (cons-val (val1 val2) val1)
+        (else (eopl:error 'cons-car "~s is not list" pair)))))
+        
+  (define cons-cdr
+    (lambda (pair)
+      (cases expval pair
+        (cons-val (val1 val2) val2)
+        (else (eopl:error 'cons-cdr "~s is not list" pair)))))
+
+  (define cons-null?
+    (lambda (p)
+      (cases expval p
+        (emptylist-val () (bool-val #t))
+        (else (bool-val #f)))))
+
+  (define empty-list
+    (emptylist-val))
 )

@@ -59,6 +59,16 @@
         (call-exp (rator rand) 
           (value-of/k rator env
             (rator-cont rand env cont)))
+        (emptylist-exp ()
+          (apply-cont cont (emptylist-val)))
+        (cons-exp (exp1 exp2)
+          (value-of/k exp1 env (cons1-cont exp2 env cont)))
+        (car-exp (exp)
+          (value-of/k exp env (car-cont cont)))
+        (cdr-exp (exp)
+          (value-of/k exp env (cdr-cont cont)))
+        (null?-exp (exp)
+          (value-of/k exp env (null-cont cont)))
    )))
 
   ;; apply-cont : Cont * ExpVal -> FinalAnswer
@@ -179,14 +189,6 @@
         (apply-cont cont
                     (num-val (- (expval->num val1)
                                 (expval->num val2)))))))
-
-;  (define rator-cont
-;    (lambda (rand env cont)
-;      (lambda (val)
-;        (let ((proc1 (expval->proc val)))
-;          (apply-cont (rand-cont proc1 env cont)
-;                      (value-of/k rand env cont))))))
-
   (define rator-cont
     (lambda (rand env cont)
       (lambda (val)
@@ -196,6 +198,31 @@
     (lambda (rator cont)
       (lambda (val)
         (apply-procedure/k (expval->proc rator) val cont))))
+
+  (define cons1-cont
+    (lambda (exp2 env cont)
+      (lambda (val)
+        (value-of/k exp2 env (cons2-cont val env cont)))))
+
+  (define cons2-cont
+    (lambda (val1 env cont)
+      (lambda (val2)
+        (apply-cont cont (cons-val val1 val2)))))
+
+  (define car-cont
+    (lambda (cont)
+      (lambda (val)
+        (apply-cont cont (cons-car val)))))
+
+  (define cdr-cont
+    (lambda (cont)
+      (lambda (val)
+        (apply-cont cont (cons-cdr val)))))
+
+  (define null-cont
+    (lambda (cont)
+      (lambda (val)
+        (apply-cont cont (cons-null? val)))))
   )
   
 
