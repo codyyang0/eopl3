@@ -69,6 +69,12 @@
           (value-of/k exp env (cdr-cont cont)))
         (null?-exp (exp)
           (value-of/k exp env (null-cont cont)))
+        (list-exp (exps)
+          (if (null? exps)
+              (apply-cont cont (emptylist-val))
+              (let ((first-exp (car exps))
+                    (rest-exps (cdr exps)))
+                (value-of/k first-exp env (list-first-cont rest-exps env cont)))))
    )))
 
   ;; apply-cont : Cont * ExpVal -> FinalAnswer
@@ -223,6 +229,16 @@
     (lambda (cont)
       (lambda (val)
         (apply-cont cont (cons-null? val)))))
+
+  (define list-first-cont
+    (lambda (exps env cont)
+      (lambda (val)
+        (value-of/k (list-exp exps) env (list-rest-cont val cont)))))
+
+  (define list-rest-cont
+    (lambda (first-val cont)
+      (lambda (rest-val)
+        (apply-cont cont (cons-val first-val rest-val)))))
   )
   
 

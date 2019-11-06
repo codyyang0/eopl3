@@ -85,6 +85,10 @@
       (expression
        ("emptylist")
        emptylist-exp)
+
+      (expression
+       ("list" "(" (separated-list expression ",") ")")
+       list-exp)
       ))
 
   ;;;;;;;;;;;;;;;; sllgen boilerplate ;;;;;;;;;;;;;;;;
