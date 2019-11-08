@@ -34,6 +34,11 @@
       (cases environment env
         (empty-env ()
           (eopl:error 'apply-env "No binding for ~s" search-sym))
+        (extend-env* (vars vals saved-env)
+          (let ((index (index-of search-sym vars)))
+            (if (eqv? (index-of search-sym vars) -1)
+                (apply-env search-sym env)
+                (list-ref vals index))))
         (extend-env (var val saved-env)
 	  (if (eqv? search-sym var)
 	    val

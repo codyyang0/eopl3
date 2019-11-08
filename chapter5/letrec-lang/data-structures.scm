@@ -96,6 +96,10 @@
       (bvar symbol?)
       (bval expval?)
       (saved-env environment?))
+    (extend-env*
+     (bvars (list-of symbol?))
+     (bvals (list-of expval?))
+     (saved-env environment?))
     (extend-env-rec
       (p-name symbol?)
       (b-var symbol?)

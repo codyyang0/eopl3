@@ -36,20 +36,24 @@
 
       (expression (identifier) var-exp)
 
+;      (expression
+;       ("let" identifier "=" expression "in" expression)
+;       let-exp)
+;
+;      (expression
+;       ("let2" identifier "=" expression ","
+;               identifier "=" expression "in" expression)
+;       let2-exp)
+;
+;      (expression
+;       ("let3" identifier "=" expression ","
+;               identifier "=" expression ","
+;               identifier "=" expression "in" expression)
+;       let3-exp)
+
       (expression
-       ("let" identifier "=" expression "in" expression)
+       ("let" (arbno identifier "=" expression) "in" expression)
        let-exp)
-
-      (expression
-       ("let2" identifier "=" expression ","
-               identifier "=" expression "in" expression)
-       let2-exp)
-
-      (expression
-       ("let3" identifier "=" expression ","
-               identifier "=" expression ","
-               identifier "=" expression "in" expression)
-       let3-exp)
 
       (expression
        ("proc" "(" identifier ")" expression)

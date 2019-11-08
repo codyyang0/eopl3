@@ -43,13 +43,22 @@
         (zero?-exp (exp1)
           (value-of/k exp1 env
             (zero1-cont cont)))
-        (let-exp (var exp1 body)
-          (value-of/k exp1 env
-            (let-exp-cont var body env cont)))
-        (let2-exp (var1 exp1 var2 exp2 body)
-          (value-of/k exp1 env (let2-exp-cont var1 var2 exp2 body env cont)))
-        (let3-exp (var1 exp1 var2 exp2 var3 exp3 body)
-          (value-of/k exp1 env (let3-exp-cont var1 var2 var3 exp2 exp3 body env cont)))
+        (let-exp (vars exps body)
+          (if (null? vars)
+              (value-of/k body env cont)
+              (let ((var1 (car vars))
+                    (exp1 (car exps))
+                    (rest-vars (cdr vars))
+                    (rest-exps (cdr exps)))
+                (value-of/k exp1 env (let-vars-cont var1 rest-vars rest-exps body env cont)))))
+          
+;        (let-exp (var exp1 body)
+;          (value-of/k exp1 env
+;            (let-exp-cont var body env cont)))
+;        (let2-exp (var1 exp1 var2 exp2 body)
+;          (value-of/k exp1 env (let2-exp-cont var1 var2 exp2 body env cont)))
+;        (let3-exp (var1 exp1 var2 exp2 var3 exp3 body)
+;          (value-of/k exp1 env (let3-exp-cont var1 var2 var3 exp2 exp3 body env cont)))
         (if-exp (exp1 exp2 exp3)
           (value-of/k exp1 env
             (if-test-cont exp2 exp3 env cont)))
@@ -158,23 +167,32 @@
           (bool-val
            (zero? (expval->num val)))))))
 
-  ; let-exp-cont : Var * Exp * Env * Cont -> Cont
-  (define let-exp-cont
-    (lambda (var body env cont)
+  (define let-cont
+    (lambda (var rest-vars rest-exps body env cont)
       (lambda (val)
-        (value-of/k body (extend-env var val env) cont))))
+        (value-of/k
+         (let-exp rest-vars rest-exps body)
+         env
+         (let-env-cont (extend-env var val env) cont)))))
+
+                    
+  ; let-exp-cont : Var * Exp * Env * Cont -> Cont
+;  (define let-exp-cont
+;    (lambda (var body env cont)
+;      (lambda (val)
+;        (value-of/k body (extend-env var val env) cont))))
 
   ; let2-exp-cont: Var * Var * Exp * Env * Cont -> Cont
-  (define let2-exp-cont
-    (lambda (var1 var2 exp2 body env cont)
-      (lambda (val1)
-        (value-of/k (let-exp var2 exp2 body) (extend-env var1 val1 env) cont))))
+;  (define let2-exp-cont
+;    (lambda (var1 var2 exp2 body env cont)
+;      (lambda (val1)
+;        (value-of/k (let-exp var2 exp2 body) (extend-env var1 val1 env) cont))))
 
   ; let2-exp-cont: Var * Var * Var * Exp * Exp * Env * Cont -> Cont
-  (define let3-exp-cont
-    (lambda (var1 var2 var3 exp2 exp3 body env cont)
-      (lambda (val1)
-        (value-of/k (let2-exp var2 exp2 var3 exp3 body) (extend-env var1 val1 env) cont))))
+;  (define let3-exp-cont
+;    (lambda (var1 var2 var3 exp2 exp3 body env cont)
+;      (lambda (val1)
+;        (value-of/k (let2-exp var2 exp2 var3 exp3 body) (extend-env var1 val1 env) cont))))
   
   ; if-test-cont: Exp * Exp * Env * Cont -> Cont
   (define if-test-cont
