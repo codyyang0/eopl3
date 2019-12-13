@@ -329,3 +329,160 @@
     (if (symbol? sexp)
         (list sexp)
         (flatten sexp))))
+
+;Exercise 1.28 [**] (merge loi1 loi2), where loi1 and loi2 are lists of integers
+;that are sorted in ascending order, returns a sorted list of all the integers in
+;loi1 and loi2
+;merge : Listof(Int) * Listof(Int) -> Listof(Int)
+(define merge
+  (lambda (loi1 loi2)
+    (if (null? loi1)
+        loi2
+        (merge (cdr loi1) (merge-i-in-loi (car loi1) loi2)))))
+
+(define merge-i-in-loi
+  (lambda (i loi)
+    (if (null? loi)
+        (list i)
+        (if (> i (car loi))
+            (cons (car loi) (merge-i-in-loi i (cdr loi)))
+            (cons i loi)))))
+
+;Exercise 1.29 [**] (sort loi) returns a list of the elements of loi in ascending order.
+;sort : Listof(Int) -> Listof(Int)
+(define sort
+  (lambda (loi)
+    (if (null? loi)
+        '()
+        (cons (min (car loi) (cdr loi))
+              (sort (sort-remain (car loi) (cdr loi)))))))     
+
+(define min
+  (lambda (i loi)
+    (if (null? loi)
+        i
+        (if (< i (car loi))
+            (min i (cdr loi))
+            (min (car loi) (cdr loi))))))
+
+(define sort-remain
+  (lambda (i loi)
+    (if (null? loi)
+        '()
+        (if (< i (car loi))
+            (cons (car loi) (sort-remain i (cdr loi)))
+            (cons i (sort-remain (car loi) (cdr loi)))))))
+
+;Exercise 1.30 [**] (sort/predicate pred loi) returns a list of elements sorted
+;by the predicate
+;sort : pred Listof(Int) -> Listof(Int)
+(define sort/predicate
+  (lambda (pred loi)
+    (if (null? loi)
+        '()
+        (cons (pred-element-in-loi pred (car loi) (cdr loi))
+              (sort/predicate pred (pred-remain-elements pred (car loi) (cdr loi)))))))
+
+(define pred-element-in-loi
+  (lambda (pred i loi)
+    (if (null? loi)
+        i
+        (if (pred i (car loi))
+            (pred-element-in-loi pred i (cdr loi))
+            (pred-element-in-loi pred (car loi) (cdr loi))))))
+
+(define pred-remain-elements
+    (lambda (pred i loi)
+    (if (null? loi)
+        '()
+        (if (pred i (car loi))
+            (cons (car loi) (pred-remain-elements pred i (cdr loi)))
+            (cons i (pred-remain-elements pred (car loi) (cdr loi)))))))
+
+;Exercise 1.31 [*] Write the following procedures for calculating on a bintree
+;(definition 1.17):leaf and interior-node, which build bintrees, leaf?, which tests
+;whether a bintree is a leaf, and lson, rson, and contents-of, which extract the
+;components of a node. contents-of should work on both leaves and interior nodes.
+;leaf : Int -> leaf
+(define leaf
+  (lambda (i) i))
+
+;interior-node : Sym * Bintree * Bintree -> Bintree
+(define interior-node
+  (lambda (s bt1 bt2)
+    (list s bt1 bt2)))
+
+;leaf? : bintree -> boolean
+(define leaf?
+  (lambda (bintree)
+    (if (number? bintree) #t #f)))
+
+;lson : interior-node -> bintree
+(define lson
+  (lambda (inode) (cadr inode)))
+
+;rson : interior-node -> bintree
+(define rson
+  (lambda (inode) (caddr inode)))
+
+;contents-of : bintree -> Int | Symbol
+(define contents-of
+  (lambda (bintree)
+    (if (leaf? bintree)
+        bintree
+        (car bintree))))
+
+;Exercise 1.32 [*] Write a procedure double-tree that takes a bintree, as represented
+;in definition 1.17, and produres another bintree like the original, but with all the
+;integers in the leaves doubled.
+;double-tree : bintree -> bintree
+(define double-tree
+  (lambda (bintree)
+    (if (leaf? bintree)
+        (* 2 (contents-of bintree))
+        (interior-node
+         (contents-of bintree)
+         (double-tree (lson bintree))
+         (double-tree (rson bintree))))))
+
+;Exercise 1.33 [**] Write a procedure mark-leaves-with-red-depth that takes a bintree
+;(definition 1.1.7), and produces a bintree of the same shape as the original,
+;except that in the new tree, each leaf contains the integer of nodes between it and the
+;root that contain the symbol red. 
+;mark-leaves-with-red-depth : bintree -> bintree
+;(define mark-leaves-with-red-depth)
+;
+;
+;(define mark-leaves-with-color-depth
+;  (lambda (color bintree)
+;    (
+;     
+;
+;; depth-of-color-in-btree : color * bintree * Int -> Int
+;(define depth-of-color-in-btree
+;  (lambda (color btree depth)
+;    (if (leaf? btree)
+;        depth
+;        (if (eqv? color (contents-of btree)) (+ 1 depth)))))
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
