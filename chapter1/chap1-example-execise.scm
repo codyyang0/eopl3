@@ -117,17 +117,17 @@
             
 ;number-elements-from : Listof(schemeVal) * Int -> Listof(List(Int,SchemeVal))
 ;usage: (number-elements-from ’(v0 v1 v2 ...) n) = ((n v0) (n+1 v1) (n+2 v2) ...)
-(define number-elements-from
-  (lambda (lst n)
-    (if (null? lst) '()
-        (cons
-         (list n (car lst))
-         (number-elements-from (cdr lst) (+ n 1))))))
+;(define number-elements-from
+;  (lambda (lst n)
+;    (if (null? lst) '()
+;        (cons
+;         (list n (car lst))
+;         (number-elements-from (cdr lst) (+ n 1))))))
 
 ;number-elements : List -> Listof(List(Int, SchemeVal))
-(define number-elements
-  (lambda (lst)
-    (number-elements-from lst 0)))
+;(define number-elements
+;  (lambda (lst)
+;    (number-elements-from lst 0)))
 
 ;list-sum : Listof(Int) -> Int
 (define list-sum
@@ -450,22 +450,103 @@
 ;except that in the new tree, each leaf contains the integer of nodes between it and the
 ;root that contain the symbol red. 
 ;mark-leaves-with-red-depth : bintree -> bintree
-;(define mark-leaves-with-red-depth)
-;
-;
-;(define mark-leaves-with-color-depth
-;  (lambda (color bintree)
-;    (
-;     
-;
-;; depth-of-color-in-btree : color * bintree * Int -> Int
-;(define depth-of-color-in-btree
-;  (lambda (color btree depth)
-;    (if (leaf? btree)
-;        depth
-;        (if (eqv? color (contents-of btree)) (+ 1 depth)))))
+(define mark-leaves-with-red-depth
+  (lambda (bintree)
+    (mark-leaves-with-color-depth 'red bintree 0)))
+
+;bintree-color-depth : Sym * bintree * Int -> Int
+(define bintree-color-depth
+  (lambda (color bintree depth)
+    (if (leaf? (contents-of bintree))
+        depth
+        (if (eqv? (contents-of bintree) color)
+            (+ depth 1)
+            depth))))
+
+;mark-leaves-with-color-depth: Sym * bintree * Int -> bintree
+(define mark-leaves-with-color-depth
+  (lambda (color bintree depth)
+    (if (leaf? bintree)
+        (leaf depth)
+        (interior-node
+         (contents-of bintree)
+         (mark-leaves-with-color-depth
+          color
+          (lson bintree)
+          (bintree-color-depth color bintree depth))
+         (mark-leaves-with-color-depth
+          color
+          (rson bintree)
+          (bintree-color-depth color bintree depth))))))
+     
+;Exercise 1.34 [***] Write a procedure path that takes an integer n and a binary
+;search tree bst (page 10) that contains the integer n, and returns a list of leafs
+;and rights showing how to find the node containing n. If n is found at the root, it returns
+;the empty list.
+;path : bst * Int -> ListOf(Sym)
+(define path
+  (lambda (i bst)
+    (if (null? bst)
+        '()
+        (path-signal bst '() i))))
 
 
+;path-signal : bst * ListOf(Sym) * Int -> ListOf(sym)
+(define path-signal
+  (lambda (bst lst i)
+    (cond
+      ((= i (car bst)) lst)
+      ((> i (car bst)) (path-signal (caddr bst) (append lst (list 'right)) i))
+      (else
+       (path-signal (cadr bst) (append lst (list 'left)) i)))))
+        
+;Exercise 1.35 [***] Write a procedure number-leaves that takes a bintree, and produces
+;a bintree like the original, except the contents of the leaves are numbered
+;starting from 0.
+; number-leaves : bintree -> bintree
+(define number-leaves
+  (lambda (bintree)
+    (if (null? bintree)
+        '()
+        (leaf-with-number bintree 0))))
+
+; leaf-number : bintree * Int -> Int
+(define leaf-number
+  (lambda (bintree i)
+    (if (leaf? bintree)
+        (+ i 1)
+        (+ (leaf-number (lson bintree) i)
+           (leaf-number (rson bintree) 0)))))
+         
+; leaf-number : bintree * Int -> bintree
+(define leaf-with-number
+  (lambda (bintree i)
+    (if (leaf? bintree)
+        (leaf i)
+        (interior-node
+         (contents-of bintree)
+         (leaf-with-number (lson bintree) i)
+         (leaf-with-number (rson bintree) (leaf-number (lson bintree) i))))))
+         
+;Exercise 1.36 [***] Write a procedure g such that number-elements from page 23
+;could be defined as
+(define number-elements
+  (lambda (lst)
+    (if (null? lst) '()
+        (g (list 0 (car lst)) (number-elements (cdr lst))))))
+
+; g : lst * lst -> lst
+(define g
+  (lambda (pre-lst lst)
+    (if (null? lst)
+        (list pre-lst)
+        (cons
+          pre-lst
+          (map (lambda (p)
+                 (cons (+ 1 (car p))
+                       (cdr p)))
+               lst)))))
+                 
         
 
 
