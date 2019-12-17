@@ -88,5 +88,80 @@
     (report-unit-tests-completed 'reverse-number-representation)
     )
 
+  (let ()
+    ;; Bignum representation
+    ;; Page 34 Exercise 2.1
+    (define zero (lambda () '()))
+    (define is-zero? null?)
+    (define successor
+      (lambda (n)
+        (cond
+          ((null? n) (list 1))
+          ((equal? 99999999 (car n)) (cons 0 (successor (cdr n))))
+          (else (cons (+ (car n) 1) (cdr n))))))
+   
+    (define predecessor
+      (lambda (n)
+        (cond
+          ((null? n) (list -1))
+          ((equal? '(1) n) '())
+          ((equal? 0 (car n)) (cons 99999999 (predecessor (cdr n))))
+          (else
+           (cons (- (car n) 1) (cdr n))))))
+
+        ;; unchanged below here!
+
+    (define plus
+      (lambda (x y)
+        (if (is-zero? x)
+          y
+          (plus (predecessor x) (successor y)))))
+
+    (define (scheme-int->my-int n)
+        (if (zero? n) (zero)
+          (successor (scheme-int->my-int (- n 1)))))
+
+    (define (my-int->scheme-int x)
+        (if (is-zero? x) 0
+          (+ 1 (my-int->scheme-int (predecessor x)))))
+
+    (equal?? 
+      (my-int->scheme-int
+        (plus 
+          (scheme-int->my-int 3)
+          (scheme-int->my-int 7)))
+      10)
+
+    (define multi
+      (lambda (x y)
+        (mult-aux (zero) x y)))
+
+    (define mult-aux
+      (lambda (a x y)
+        (if (equal? y (successor (zero)))
+            (plus a x)
+            (mult-aux (plus a x) x (predecessor y)))))
+    
+    (equal??
+     (my-int->scheme-int
+      (multi
+       (scheme-int->my-int 10)
+       (scheme-int->my-int 10)))
+     100)
+
+    (define fact
+      (lambda (x)
+        (if (equal? x (successor (zero)))
+            x
+            (multi x (fact (predecessor x))))))
+    
+;    (equal??
+;     (my-int->scheme-int
+;      (fact
+;       (scheme-int->my-int 10)))
+;     3628800)
+    
+    (report-unit-tests-completed 'bignum-representation))
+
   )
 
