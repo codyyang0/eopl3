@@ -323,4 +323,322 @@
     (equal?? (has-binding? e 'a) #f)
     (report-unit-tests-completed 'list-precedures-env-represent))
 
+;Page 43
+;Exercise 2.15 [*] Implement the lambda-calculus expression interface for the
+;representation specified by the grammar above.
+  (let ()
+    (define var-exp
+      (lambda (var) var))
+
+    (define lambda-exp
+      (lambda (var lcExp)
+        (list 'lambda (list var) lcExp)))
+
+    (define app-exp
+      (lambda (lcExp1 lcExp2)
+        (list lcExp1 lcExp2)))
+
+    (define var-exp?
+      (lambda (lcExp)
+        (identifier? lcExp)))
+
+    (define identifier?
+      (lambda (s)
+        (and
+         (symbol? s)
+         (not (eqv? 'lambda s)))))
+  
+    (define lambda-exp?
+      (lambda (lcExp)
+        (if (not (eqv? (car lcExp) 'lambda))
+            #f
+            (let ((var (caadr lcExp))
+                  (saved-lcExp (caddr lcExp)))
+              (and
+               (identifier? var)
+               (or
+                (var-exp? saved-lcExp)
+                (lambda-exp? saved-lcExp)
+                (app-exp? saved-lcExp)))))))
+
+    (define app-exp?
+      (lambda (lcExp)
+        (let ((lcExp1 (car lcExp))
+              (lcExp2 (cadr lcExp)))
+          (and
+           (or
+            (var-exp? lcExp1)
+            (lambda-exp? lcExp1)
+            (app-exp? lcExp1))
+           (or
+            (var-exp? lcExp2)
+            (lambda-exp? lcExp2)
+            (app-exp? lcExp2))))))
+
+    (define var-exp->var
+      (lambda (lcExp) lcExp))
+
+    (define lambda-exp->bound-var
+      (lambda (lcExp)
+        (caadr lcExp)))
+
+    (define lambda-exp->body
+      (lambda (lcExp)
+        (caddr lcExp)))
+
+    (define app-exp->rator
+      (lambda (lcExp)
+        (car lcExp)))
+
+    (define app-exp->rand
+      (lambda (lcExp)
+        (cadr lcExp)))
+
+    (define occurs-free?
+      (lambda (search-var exp)
+        (cond
+          ((var-exp? exp) (eqv? search-var (var-exp->var exp)))
+          ((lambda-exp? exp)
+           (and
+            (not (eqv? search-var (lambda-exp->bound-var exp)))
+            (occurs-free? search-var (lambda-exp->body exp))))
+          (else
+           (or
+            (occurs-free? search-var (app-exp->rator exp))
+            (occurs-free? search-var (app-exp->rand exp)))))))
+
+    ;; a few small unit tests
+    (equal??
+     (occurs-free? 'a (lambda-exp 'a (app-exp (var-exp 'b) (var-exp 'a))))
+     #f)
+
+    (equal??
+     (occurs-free? 'b (lambda-exp 'a (app-exp (var-exp 'b) (var-exp 'a))))
+     #t)
+
+    (report-unit-tests-completed 'occurs-free?))
+
+;Page 43
+;Exercise 2.16 [*] Modify the implementation to use a representation in which there
+;are no parentheses around the bound variable in a lambda expression.
+;Lc-exp ::= Identifier
+;       ::= (lambda Identifier Lc-exp)
+;       ::= (Lc-exp Lc-exp)
+  (let ()
+    (define var-exp
+      (lambda (var) var))
+
+    (define lambda-exp
+      (lambda (var lcExp)
+        (list 'lambda var lcExp)))
+
+    (define app-exp
+      (lambda (lcExp1 lcExp2)
+        (list lcExp1 lcExp2)))
+
+    (define var-exp?
+      (lambda (lcExp)
+        (identifier? lcExp)))
+
+    (define identifier?
+      (lambda (s)
+        (and
+         (symbol? s)
+         (not (eqv? 'lambda s)))))
+  
+    (define lambda-exp?
+      (lambda (lcExp)
+        (if (not (eqv? (car lcExp) 'lambda))
+            #f
+            (let ((var (cadr lcExp))
+                  (saved-lcExp (caddr lcExp)))
+              (and
+               (identifier? var)
+               (or
+                (var-exp? saved-lcExp)
+                (lambda-exp? saved-lcExp)
+                (app-exp? saved-lcExp)))))))
+
+    (define app-exp?
+      (lambda (lcExp)
+        (let ((lcExp1 (car lcExp))
+              (lcExp2 (cadr lcExp)))
+          (and
+           (or
+            (var-exp? lcExp1)
+            (lambda-exp? lcExp1)
+            (app-exp? lcExp1))
+           (or
+            (var-exp? lcExp2)
+            (lambda-exp? lcExp2)
+            (app-exp? lcExp2))))))
+    
+    (define var-exp->var
+      (lambda (lcExp) lcExp))
+
+    (define lambda-exp->bound-var
+      (lambda (lcExp)
+        (cadr lcExp)))
+
+    (define lambda-exp->body
+      (lambda (lcExp)
+        (caddr lcExp)))
+
+    (define app-exp->rator
+      (lambda (lcExp)
+        (car lcExp)))
+
+    (define app-exp->rand
+      (lambda (lcExp)
+        (cadr lcExp)))
+
+    (define occurs-free?
+      (lambda (search-var exp)
+        (cond
+          ((var-exp? exp) (eqv? search-var (var-exp->var exp)))
+          ((lambda-exp? exp)
+           (and
+            (not (eqv? search-var (lambda-exp->bound-var exp)))
+            (occurs-free? search-var (lambda-exp->body exp))))
+          (else
+           (or
+            (occurs-free? search-var (app-exp->rator exp))
+            (occurs-free? search-var (app-exp->rand exp)))))))
+
+    ;; a few small unit tests
+    (equal??
+     (occurs-free? 'a (lambda-exp 'a (app-exp (var-exp 'b) (var-exp 'a))))
+     #f)
+
+    (equal??
+     (occurs-free? 'b (lambda-exp 'a (app-exp (var-exp 'b) (var-exp 'a))))
+     #t)
+
+    (report-unit-tests-completed 'occurs-free?))
+
+;Page 44
+;Exercise 2.18
+  ;NodeInSequence ::= (Int Listof(Int) Listof(Int))
+  (let ()
+    (define number->sequence
+      (lambda (i)
+        (list i '() '())))
+
+    (define current-element
+      (lambda (seq)
+        (car seq)))
+
+    (define left-list
+      (lambda (seq)
+        (cadr seq)))
+
+    (define right-list
+      (lambda (seq)
+        (caddr seq)))
+
+    (define move-to-left
+      (lambda (seq)
+        (let ((cur-node (current-element seq))
+              (left (left-list seq))
+              (right (right-list seq)))
+          (let ((new-cur-node (car left))
+                (new-l (cdr left))
+                (new-r (cons cur-node right)))
+            (list new-cur-node new-l new-r)))))
+
+    (define move-to-right
+      (lambda (seq)
+        (let ((cur-node (current-element seq))
+              (left (left-list seq))
+              (right (right-list seq)))
+          (let ((new-cur-node (car right))
+                (new-l (cons cur-node left))
+                (new-r (cdr right)))
+            (list new-cur-node new-l new-r)))))
+
+    (define insert-to-left
+      (lambda (i seq)
+        (let ((cur-node (current-element seq))
+              (left (left-list seq))
+              (right (right-list seq)))
+          (list cur-node
+                (cons i left)
+                right))))
+    
+    (define insert-to-right
+      (lambda (i seq)
+        (let ((cur-node (current-element seq))
+              (left (left-list seq))
+              (right (right-list seq)))
+          (list cur-node
+                left
+                (cons i right)))))
+
+    (equal?? (number->sequence 7) '(7 () ()))
+    (equal?? (current-element '(6 (5 4 3 2 1) (7 8 9))) 6)
+    (equal?? (move-to-left '(6 (5 4 3 2 1) (7 8 9))) '(5 (4 3 2 1) (6 7 8 9)))
+    (equal?? (move-to-right '(6 (5 4 3 2 1) (7 8 9))) '(7 (6 5 4 3 2 1) (8 9)))
+    (equal?? (insert-to-left 13 '(6 (5 4 3 2 1) (7 8 9))) '(6 (13 5 4 3 2 1) (7 8 9)))
+    (equal?? (insert-to-right 13 '(6 (5 4 3 2 1) (7 8 9))) '(6 (5 4 3 2 1) (13 7 8 9)))
+    (report-unit-tests-completed 'NodeInSequence))
+
+;Page 44
+;Exercise 2.19
+  ;Bintree ::= () | (Int Bintree Bintree)
+  (let ()
+    (define number->bintree
+      (lambda (i)
+        (list i '() '())))
+
+    (define at-leaf? null?)
+
+    (define current-element
+      (lambda (bt)
+        (car bt)))
+
+    (define move-to-left
+      (lambda (bt)
+        (cadr bt)))
+
+    (define move-to-right
+      (lambda (bt)
+        (caddr bt)))
+
+    (define insert-to-left
+      (lambda (i bt)
+        (let ((cur-e (current-element bt))
+              (left (move-to-left bt))
+              (right (move-to-right bt)))
+          (if (at-leaf? left)
+              (let ((new-left (number->bintree i)))
+                (list cur-e new-left right))
+              (list cur-e
+                    (list i left '())
+                    right)))))
+
+    (define insert-to-right
+      (lambda (i bt)
+        (let ((cur-e (current-element bt))
+              (left (move-to-left bt))
+              (right (move-to-right bt)))
+          (if (at-leaf? right)
+              (let ((new-right (number->bintree i)))
+                (list cur-e left new-right))
+              (list cur-e
+                    left
+                    (list i '() right))))))
+
+    (equal?? (number->bintree 13) '(13 () ()))
+    (define t1 (insert-to-right 14 (insert-to-left 12 (number->bintree 13))))
+    (equal?? t1 '(13 (12 () ()) (14 () ())))
+    (equal?? (move-to-left t1) '(12 () ()))
+    (equal?? (current-element (move-to-left t1)) 12)
+    (equal?? (at-leaf? (move-to-right (move-to-left t1))) #t)
+    (equal?? (insert-to-left 15 t1) '(13 (15 (12 () ()) ()) (14 () ())))
+    (report-unit-tests-completed 'Bintree))
+
+;Page 45
+;Exercise 2.20 [***]
+  ;Bintree ::= () | 
+    
   )
