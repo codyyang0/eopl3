@@ -638,7 +638,62 @@
     (report-unit-tests-completed 'Bintree))
 
 ;Page 45
-;Exercise 2.20 [***]
-  ;Bintree ::= () | 
+;Exercise 2.20 [***] In the representation of binary trees in exercise 2.19 it is easy to
+;move from a parent node to one of its sons, but it is impossible to move from a son to
+;its parent without the help of context arguments. Extend the representation of lists in
+;exercise 2.18 to represent nodes in a binary tree. As a hint, consider representing the
+;portion of the tree above the current node by a reversed list, as in exercise 2.18.
+;In this representation, implement the procedures from exercise 2.19. Also implement
+;move-up, at-root?, and at-leaf?
+  
+  ;Bintree ::= () | (Int Bintree Bintree)
+  ;nodeInBintree ::= (Bintree Listof(Bintree))
+  
+  (let ()
+    (define number->bintree
+      (lambda (i)
+        (list i '() '())))
+
+    (define current-element
+      (lambda (nodeInSeq) (car nodeInSeq)))
+
+    (define parents
+      (lambda (nodeInSeq)
+        (cadr nodeInSeq)))
+
+    (define at-leaf?
+      (lambda (nodeInSeq)
+        (null? (current-element nodeInSeq))))
+
+    (define at-root?
+      (lambda (nodeInSeq)
+        (null? (parents nodeInSeq))))
+      
+    (define move-to-left
+      (lambda (nodeInSeq)
+        (let ((node (current-element nodeInSeq))
+              (ps (parents nodeInSeq)))
+          (let ((new-node (cadr node))
+                (new-ps (cons node ps)))
+            (list new-node new-ps)))))
+
+    (define move-to-right
+      (lambda (nodeInSeq)
+        (let ((node (current-element nodeInSeq))
+              (ps (parents nodeInSeq)))
+          (let ((new-node (caddr node))
+                (new-ps (cons node ps)))
+            (list new-node new-ps)))))
+
+    (define move-up
+      (lambda (nodeInSeq)
+        (let ((new-node (car (parents nodeInSeq)))
+              (new-parents (cadr (parents nodeInSeq))))
+          (list new-node new-parents))))
+
+    (define insert-to-right
+      (lambda (i nodeInSeq)
+        
+    
     
   )
