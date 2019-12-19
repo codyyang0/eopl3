@@ -648,11 +648,12 @@
   
   ;Bintree ::= () | (Int Bintree Bintree)
   ;nodeInBintree ::= (Bintree Listof(Bintree))
+  ;Bintree ::= 
   
   (let ()
     (define number->bintree
       (lambda (i)
-        (list i '() '())))
+        (list (i '() '()) '())))
 
     (define current-element
       (lambda (nodeInSeq) (car nodeInSeq)))
