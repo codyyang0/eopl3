@@ -742,6 +742,8 @@
     (equal?? (at-root? (move-to-left t1)) #f)
     (equal?? (move-up (move-to-left t1)) '((13 (12 () ()) (14 () ())) ()))
     (equal?? (move-up (move-to-right t1)) '((13 (12 () ()) (14 () ())) ()))
+    (define t2 (insert-to-left 15 t1))
+    (equal?? (move-to-left t2) '((15 (12 () ()) ()) ((13 (15 (12 () ()) ()) (14 () ())) ())))
     (report-unit-tests-completed 'nodeInBt))
     
   )
