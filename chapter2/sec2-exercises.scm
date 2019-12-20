@@ -745,5 +745,173 @@
     (define t2 (insert-to-left 15 t1))
     (equal?? (move-to-left t2) '((15 (12 () ()) ()) ((13 (15 (12 () ()) ()) (14 () ())) ())))
     (report-unit-tests-completed 'nodeInBt))
+
+;Page 50
+;Exercise 2.21 [*] Implement the data type of environments, as in section 2.2.2, using
+;define-datatype. Then include has-binding? of exercise 2.9.
+  (let ()
+    (define identifier?
+      (lambda (s)
+        (and
+         (symbol? s)
+         (not (eqv? 'lambda s)))))
     
+    (define-datatype env env?
+      (empty-env)
+      (extend-env
+       (var identifier?)
+       (val (lambda (v) (not (null? v))))
+       (saved-env env?)))
+
+    (define apply-env
+      (lambda (e search-var)
+        (cases env e
+          (empty-env () (report-no-binding-found search-var))
+          (extend-env (var val saved-env)
+            (if (eqv? search-var var) val (apply-env saved-env search-var)))
+          (else
+           (report-invalid-env e)))))
+
+    (define empty-env?
+      (lambda (e)
+        (cases env e
+          (empty-env () #t)
+          (extend-env (var val saved-env) #f))))
+
+    (define has-binding?
+      (lambda (e search-var)
+        (cases env e
+          (empty-env () #f)
+          (extend-env (var val saved-env)
+            (if (eqv? search-var var) #t (has-binding? saved-env search-var)))
+          (else #f))))
+
+    (define e
+     (extend-env 'd 6
+       (extend-env 'y 8
+         (extend-env 'x 7
+           (extend-env 'y 14
+             (empty-env))))))
+    
+    (equal?? (apply-env e 'd) 6)
+    (equal?? (apply-env e 'y) 8)
+    (equal?? (apply-env e 'x) 7)
+    (equal?? (empty-env? (empty-env)) #t)
+    (equal?? (empty-env? e) #f)
+    (equal?? (has-binding? e 'x) #t)
+    (equal?? (has-binding? e 'a) #f)
+    (report-unit-tests-completed 'datatype-env))
+
+;Exercise 2.22 [*] Using define-datatype, implement the stack data type of
+;Exercise 2.4
+  (let ()
+    (define report-pop-err
+      (lambda (s)
+        (eopl:error 'pop "Can't pop from empty stack")))
+    
+    (define-datatype stack stack?
+      (empty-stack)
+      (push
+       (v (lambda (n) (not (null? n))))
+       (saved-stack stack?)))
+
+    (define pop
+      (lambda (s)
+        (cases stack s
+          (empty-stack () (report-pop-err))
+          (push (v saved-stack) saved-stack))))
+
+    (define top
+      (lambda (s)
+        (cases stack s
+          (empty-stack () '())
+          (push (v saved-stack) v))))
+
+    (define empty-stack?
+      (lambda (s)
+        (cases stack s
+          (empty-stack () #t)
+          (push (v saved-stack) #f))))
+
+    (equal?? (empty-stack? (empty-stack)) #t)
+    (equal?? (top (push 'a (empty-stack))) 'a)
+    (equal?? (pop (push 'a (push 'b (empty-stack)))) (push 'b (empty-stack)))
+    (report-unit-tests-completed 'datatype-stack))
+
+
+;Page 50
+;Exercise 2.23
+  (let ()
+    (define identifier?
+      (lambda (v)
+        (lambda (v)
+          (and
+           (symbol? v)
+           (not (eqv? 'lambda v))))))
+    
+    (define-datatype lc-exp lc-exp?
+      (var-exp
+       (var identifier?))
+      (lambda-exp
+       (bound-var identifier?)
+       (body lc-exp?))
+      (app-exp
+       (rator lc-exp?)
+       (rand lc-exp?)))
+
+    ;occurs-free? : Sym × LcExp → Bool
+    (define occurs-free?
+      (lambda (search-var exp)
+        (cases lc-exp exp
+          (var-exp (var) (eqv? var search-var))
+          (lambda-exp (bound-var body)
+            (and
+             (not (eqv? search-var bound-var))
+             (occurs-free? search-var body)))
+          (app-exp (rator rand)
+            (or
+             (occurs-free? search-var rator)
+             (occurs-free? search-var rand))))))
+
+    ;; a few small unit tests
+    (equal??
+     (occurs-free? 'a (lambda-exp 'a (app-exp (var-exp 'b) (var-exp 'a))))
+     #f)
+
+    (equal??
+     (occurs-free? 'b (lambda-exp 'a (app-exp (var-exp 'b) (var-exp 'a))))
+     #t)
+
+    (report-unit-tests-completed 'occurs-free?))
+
+;Exercise 2.24 [*]
+  (let ()
+    (define-datatype bintree bintree?
+      (leaf-node
+       (num integer?))
+      (interior-node
+       (key symbol?)
+       (left bintree?)
+       (right bintree?)))
+
+    ;bintree-to-list : bintree -> list
+    (define bintree-to-list
+      (lambda (bt)
+        (cases bintree bt
+          (leaf-node (num) (list 'leaf-node num))
+          (interior-node (key left right)
+            (list 'interior-node
+                  key
+                  (bintree-to-list left)
+                  (bintree-to-list right))))))
+
+    ;这个属于client端的，还是interface端的呢?
+    ;max-interior : bintree -> symbol
+
+    (equal?? (bintree-to-list (interior-node 'a (leaf-node 3) (leaf-node 4)))
+             '(interior-node a (leaf-node 3) (leaf-node 4)))
+    (report-unit-tests-completed 'bintree-to-list))
+
+;Exercise 2.25 
+           
   )
