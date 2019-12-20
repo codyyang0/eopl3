@@ -648,53 +648,100 @@
   
   ;Bintree ::= () | (Int Bintree Bintree)
   ;nodeInBintree ::= (Bintree Listof(Bintree))
-  ;Bintree ::= 
   
   (let ()
     (define number->bintree
-      (lambda (i)
-        (list (i '() '()) '())))
+      (lambda (i) (list i '() '())))
 
-    (define current-element
-      (lambda (nodeInSeq) (car nodeInSeq)))
+    ;node
+    (define leaf? null?)
+    (define leaf (lambda () '()))
+    (define branch (lambda (i bt1 bt2) (list i bt1 bt2)))
+    (define current-element (lambda (node) (car node)))
+    (define left (lambda (node) (cadr node)))
+    (define right (lambda (node) (caddr node)))
 
+    ;node In Bintree
+    (define nodeInBt
+      (lambda (node loBt) (list node loBt)))
+    (define current-node
+      (lambda (nodeInBt) (car nodeInBt)))
     (define parents
-      (lambda (nodeInSeq)
-        (cadr nodeInSeq)))
-
+      (lambda (nodeInBt) (cadr nodeInBt)))
     (define at-leaf?
-      (lambda (nodeInSeq)
-        (null? (current-element nodeInSeq))))
-
+      (lambda (nodeInBt) (leaf? (current-node nodeInBt))))
     (define at-root?
-      (lambda (nodeInSeq)
-        (null? (parents nodeInSeq))))
+      (lambda (nodeInBt) (null? (parents nodeInBt))))
       
     (define move-to-left
-      (lambda (nodeInSeq)
-        (let ((node (current-element nodeInSeq))
-              (ps (parents nodeInSeq)))
-          (let ((new-node (cadr node))
-                (new-ps (cons node ps)))
+      (lambda (nodeInBt)
+        (let ((node (current-node nodeInBt))
+              (ps (parents nodeInBt)))
+          (let ((new-node (left node))
+                (new-ps (list node ps)))
             (list new-node new-ps)))))
 
     (define move-to-right
-      (lambda (nodeInSeq)
-        (let ((node (current-element nodeInSeq))
-              (ps (parents nodeInSeq)))
-          (let ((new-node (caddr node))
-                (new-ps (cons node ps)))
+      (lambda (nodeInBt)
+        (let ((node (current-node nodeInBt))
+              (ps (parents nodeInBt)))
+          (let ((new-node (right node))
+                (new-ps (list node ps)))
             (list new-node new-ps)))))
 
     (define move-up
-      (lambda (nodeInSeq)
-        (let ((new-node (car (parents nodeInSeq)))
-              (new-parents (cadr (parents nodeInSeq))))
+      (lambda (nodeInBt)
+        (let ((new-node (car (parents nodeInBt)))
+              (new-parents (cadr (parents nodeInBt))))
           (list new-node new-parents))))
 
     (define insert-to-right
-      (lambda (i nodeInSeq)
-        
+      (lambda (i nodeInBt)
+        (let ((node (current-node nodeInBt))
+              (p (parents nodeInBt)))
+          (let ((i-node (number->bintree i))
+                (old-right (right node))
+                (old-left (left node)))
+            (let* ((new-right
+                   (list (current-element i-node)
+                         (left i-node)
+                         old-right))
+                   (new-node
+                    (list (current-element node)
+                          old-left
+                          new-right)))
+              (list new-node p))))))
+
+    (define insert-to-left
+      (lambda (i nodeInBt)
+        (let ((node (current-node nodeInBt))
+              (p (parents nodeInBt)))
+          (let ((i-node (number->bintree i))
+                (old-right (right node))
+                (old-left (left node)))
+            (let* ((new-left
+                    (list (current-element i-node)
+                          old-left
+                          (right i-node)))
+                   (new-node
+                    (list (current-element node)
+                          new-left
+                          old-right)))
+              (list new-node p))))))
     
+    (equal?? (number->bintree 13) '(13 () ()))
+    (define t (nodeInBt (number->bintree 13) '()))
+    (define t1 (insert-to-right 14
+                 (insert-to-left 12 t)))
+    (equal?? t1 '((13 (12 () ()) (14 () ())) ()))
+    (equal?? (move-to-left t1) '((12 () ()) ((13 (12 () ()) (14 () ())) ())))
+    (equal?? (current-node (current-element (move-to-left t1))) 12)
+    (equal?? (at-leaf? (move-to-right (move-to-left t1))) #t)
+    (equal?? (insert-to-left 15 t1) '((13 (15 (12 () ()) ()) (14 () ())) ()))
+    (equal?? (at-root? t1) #t)
+    (equal?? (at-root? (move-to-left t1)) #f)
+    (equal?? (move-up (move-to-left t1)) '((13 (12 () ()) (14 () ())) ()))
+    (equal?? (move-up (move-to-right t1)) '((13 (12 () ()) (14 () ())) ()))
+    (report-unit-tests-completed 'nodeInBt))
     
   )
