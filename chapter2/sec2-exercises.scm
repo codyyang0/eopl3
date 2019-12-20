@@ -905,13 +905,22 @@
                   (bintree-to-list left)
                   (bintree-to-list right))))))
 
+;Exercise 2.25 [**] Use cases to write max-interior, which takes a binary tree of
+;integers (as in the preceding exercise) with at least one interior node and returns the
+;symbol associated with an interior node with a maximal leaf sum.
     ;这个属于client端的，还是interface端的呢?
-    ;max-interior : bintree -> symbol
+    ;sum : bintree -> Int
+    (define sum
+      (lambda (bt)
+        (cases bintree bt
+          (leaf-node (num) num)
+          (interior-node (key left right) (+ (sum left) (right left))))))
 
     (equal?? (bintree-to-list (interior-node 'a (leaf-node 3) (leaf-node 4)))
              '(interior-node a (leaf-node 3) (leaf-node 4)))
     (report-unit-tests-completed 'bintree-to-list))
 
-;Exercise 2.25 
+
+  
            
   )
