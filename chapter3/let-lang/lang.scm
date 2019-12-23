@@ -16,6 +16,7 @@
       (identifier
        (letter (arbno (or letter digit "_" "-" "?")))
        symbol)
+      (oper (arbno (or "+" "-" "*" "/")) string)
       (number (digit (arbno digit)) number)
       (number ("-" digit (arbno digit)) number)
       ))
@@ -24,9 +25,29 @@
     '((program (expression) a-program)
 
       (expression (number) const-exp)
+
+      ;Page 73
+      ;Exercise 3.11
       (expression
-        ("-" "(" expression "," expression ")")
-        diff-exp)
+       (oper "(" expression "," expression ")")
+       math-exp)
+      
+;      (expression
+;        ("-" "(" expression "," expression ")")
+;        diff-exp)
+;
+;      ;Exercise 3.7
+;      (expression
+;       ("+" "(" expression "," expression ")")
+;       add-exp)
+;       
+;      (expression
+;       ("*" "(" expression "," expression ")")
+;       multi-exp)
+;      
+;      (expression
+;       ("/" "(" expression "," expression ")")
+;       quot-exp)
       
       (expression
        ("zero?" "(" expression ")")
@@ -40,7 +61,52 @@
 
       (expression
        ("let" identifier "=" expression "in" expression)
-       let-exp)   
+       let-exp)
+
+      ;Exercise 3.6 minus
+      (expression
+       ("minus" "(" expression ")")
+       minus-exp)
+
+      ;Page 73
+      ;Exercise 3.8
+      (expression
+       ("equal?" "(" expression "," expression ")")
+       equal?-exp)
+
+      (expression
+       ("greater?" "(" expression "," expression ")")
+       greater?-exp)
+
+      (expression
+       ("less?" "(" expression "," expression ")")
+       less?-exp)
+
+      (expression
+       ("cons" "(" expression "," expression ")")
+       cons-exp)
+
+      (expression
+       ("car" "(" expression ")")
+       car-exp)
+
+      (expression
+       ("cdr" "(" expression ")")
+       cdr-exp)
+
+      (expression
+       ("null?" "(" expression ")")
+       null?-exp)
+
+      (expression
+       ("emptylist")
+       emptylist-exp)
+
+      ;Page 73
+      ;Exercise 3.10
+      (expression
+       ("list" "(" (separated-list expression ",") ")")
+       list-exp)
 
       ))
   

@@ -34,14 +34,23 @@
         ;\commentbox{ (value-of (var-exp \x{}) \r) = (apply-env \r \x{})}
         (var-exp (var) (apply-env env var))
 
-        ;\commentbox{\diffspec}
-        (diff-exp (exp1 exp2)
+        ;Exercise 3.11
+        (math-exp (oper exp1 exp2)
           (let ((val1 (value-of exp1 env))
                 (val2 (value-of exp2 env)))
-            (let ((num1 (expval->num val1))
+             (let ((num1 (expval->num val1))
                   (num2 (expval->num val2)))
               (num-val
-                (- num1 num2)))))
+                ((eval oper) num1 num2)))))
+
+        ;\commentbox{\diffspec}
+;        (diff-exp (exp1 exp2)
+;          (let ((val1 (value-of exp1 env))
+;                (val2 (value-of exp2 env)))
+;            (let ((num1 (expval->num val1))
+;                  (num2 (expval->num val2)))
+;              (num-val
+;                (- num1 num2)))))
 
         ;\commentbox{\zerotestspec}
         (zero?-exp (exp1)
@@ -64,6 +73,89 @@
             (value-of body
               (extend-env var val1 env))))
 
+        ;Exercise 3.6
+        (minus-exp (exp1)
+          (let ((val1 (value-of exp1 env)))
+            (num-val (- (expval->num val1)))))
+
+        ;Exercise 3.7
+;        (add-exp (exp1 exp2)
+;          (let ((val1 (value-of exp1 env))
+;                (val2 (value-of exp2 env)))
+;            (let ((num1 (expval->num val1))
+;                  (num2 (expval->num val2)))
+;              (num-val
+;                (+ num1 num2)))))
+;
+;        (multi-exp (exp1 exp2)
+;          (let ((val1 (value-of exp1 env))
+;                (val2 (value-of exp2 env)))
+;            (let ((num1 (expval->num val1))
+;                  (num2 (expval->num val2)))
+;              (num-val
+;                (* num1 num2)))))
+;        
+;        (quot-exp (exp1 exp2)
+;          (let ((val1 (value-of exp1 env))
+;                (val2 (value-of exp2 env)))
+;            (let ((num1 (expval->num val1))
+;                  (num2 (expval->num val2)))
+;              (num-val
+;                (/ num1 num2)))))
+
+        ;Exercise 3.8
+        (equal?-exp (exp1 exp2)
+          (let ((val1 (value-of exp1 env))
+                (val2 (value-of exp2 env)))
+            (let ((num1 (expval->num val1))
+                  (num2 (expval->num val2)))
+              (bool-val
+                (= num1 num2)))))
+        
+        (greater?-exp (exp1 exp2)
+          (let ((val1 (value-of exp1 env))
+                (val2 (value-of exp2 env)))
+            (let ((num1 (expval->num val1))
+                  (num2 (expval->num val2)))
+              (bool-val
+                (> num1 num2)))))
+        
+        (less?-exp (exp1 exp2)
+          (let ((val1 (value-of exp1 env))
+                (val2 (value-of exp2 env)))
+            (let ((num1 (expval->num val1))
+                  (num2 (expval->num val2)))
+              (bool-val
+                (< num1 num2)))))
+
+        (cons-exp (exp1 exp2)
+          (let ((val1 (value-of exp1 env))
+                (val2 (value-of exp2 env)))
+            (list-val val1 val2)))
+
+        (car-exp (exp1)
+          (let ((val (value-of exp1 env)))
+            (expval->car val)))
+
+        (cdr-exp (exp1)
+          (let ((val (value-of exp1 env)))
+            (expval->cdr val)))
+
+        (null?-exp (exp1)
+          (let ((val (value-of exp1 env)))
+            (bool-val (expval->null? val))))
+
+        (emptylist-exp () (emptylist-val))
+
+        ;Page 73
+        ;Exercise 3.10
+        (list-exp (exps)
+          (if (null? exps)
+              (emptylist-val)
+              (let ((exp1 (car exps))
+                    (saved-exps (cdr exps)))
+                (let ((val1 (value-of exp1 env)))
+                  (list-val val1 (value-of (list-exp saved-exps) env))))))
         )))
 
 

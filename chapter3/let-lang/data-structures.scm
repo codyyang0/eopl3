@@ -12,7 +12,11 @@
     (num-val
       (value number?))
     (bool-val
-      (boolean boolean?)))
+      (boolean boolean?))
+    (list-val
+     (val1 expval?)
+     (val2 expval?))
+    (emptylist-val))
 
 ;;; extractors:
 
@@ -31,6 +35,29 @@
       (cases expval v
 	(bool-val (bool) bool)
 	(else (expval-extractor-error 'bool v)))))
+
+  ;; Page: 73
+  ;; Exercise 3.9 [**]
+  ;;list-val->car : ExpVal -> ExpVal
+  (define expval->car
+    (lambda (v)
+      (cases expval v
+        (list-val (val1 val2) val1)
+        (else (expval-extractor-error 'car v)))))
+
+  (define expval->cdr
+    (lambda (v)
+      (cases expval v
+        (list-val (val1 val2) val2)
+        (else (expval-extractor-error 'car v)))))
+
+  ;;predicate
+  ;;expval -> bool
+  (define expval->null?
+    (lambda (v)
+      (cases expval v
+        (emptylist-val () #t)
+        (else #f))))
 
   (define expval-extractor-error
     (lambda (variant value)
