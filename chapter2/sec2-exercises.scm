@@ -914,13 +914,47 @@
       (lambda (bt)
         (cases bintree bt
           (leaf-node (num) num)
-          (interior-node (key left right) (+ (sum left) (right left))))))
+          (interior-node (key left right)
+            (+ (sum left) (sum right))))))
 
-    (equal?? (bintree-to-list (interior-node 'a (leaf-node 3) (leaf-node 4)))
-             '(interior-node a (leaf-node 3) (leaf-node 4)))
-    (report-unit-tests-completed 'bintree-to-list))
+    ;bigger : bintree * bintree -> bintree
+    (define bigger
+      (lambda (bt1 bt2)
+        (let ((sum1 (sum bt1))
+              (sum2 (sum bt2)))
+          (if (> sum1 sum2) bt1 bt2))))
 
+    (define interior-key
+      (lambda (bt)
+        (cases bintree bt
+          (interior-node (key left right) key)
+          (else '()))))                
 
-  
+    (define max-interior
+      (lambda (bt)
+        (cases bintree bt
+          (interior-node (key left right)
+            (cases bintree left
+              (interior-node (l-key l-left l-right)
+                (cases bintree right
+                  (interior-node (r-key r-left r-right)
+                    (interior-key (bigger bt (bigger left right))))
+                  (else (interior-key (bigger bt left)))))
+              (else
+               (cases bintree right
+                 (interior-node (r-key r-left r-right)
+                   (interior-key (bigger bt right)))
+                 (else (interior-key bt))))))
+          (else '()))))
+                         
+    (define tree-1 (interior-node 'foo (leaf-node 2) (leaf-node 3)))
+    (define tree-2 (interior-node 'bar (leaf-node -1) tree-1))
+    (define tree-3 (interior-node 'baz tree-2 (leaf-node 1)))
+    (eopl:printf "~s~%" (symbol->string (max-interior tree-2)))
+    (eopl:printf "~s~%" (symbol->string (max-interior tree-3))))
+
+;;Page 51 - Skipped
+;;Exercise 2.26
+
            
   )
