@@ -48,13 +48,16 @@
           (let ((val1 (value-of exp1 env)))
             (let ((num1 (expval->num val1)))
               (if (zero? num1)
-                (bool-val #t)
-                (bool-val #f)))))
+                (num-val 1)
+                (num-val 0)))))
+
+        (bool-exp (logic exp1 exps)
+          (value-of-bool-exp exp env))
               
         ;\commentbox{\ma{\theifspec}}
         (if-exp (exp1 exp2 exp3)
           (let ((val1 (value-of exp1 env)))
-            (if (expval->bool val1)
+            (if (not (eqv? (expval->num val1) 0))
               (value-of exp2 env)
               (value-of exp3 env))))
 
@@ -66,6 +69,30 @@
 
         )))
 
+  ;Page 73
+  ;Exercise 3.14 [**]
+  (define value-of-bool-exp
+    (lambda (exp env)
+      (cases expression exp
+        (bool-exp (pred exp1 exps)
+          (if (null? exps)
+              (num-val 1) ;expval: true
+              (let ((exp2 (car exps))
+                    (saved-exps (cdr exps)))
+                (let ((val1 (value-of exp1 env))
+                      (val2 (value-of exp2 env)))
+                  (let ((num1 (expval->num val1))
+                        (num2 (expval->num val2)))
+                    (let ((oper (if (eqv? pred 'greater?)
+                                    >
+                                    (if (eqv? pred 'less?) < =))))
+                      (if (not (oper num1 num2))
+                          (num-val 0)
+                          (value-of-bool-exp (bool-exp pred exp1 saved-exps)))))))))
+        (else
+         (let ((val (value-of exp env)))
+           (let ((num (expval->num val)))
+             (if (= num 0) (num-val 0) (num-val 1))))))))
 
   )
 

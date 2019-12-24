@@ -14,15 +14,15 @@
     '((whitespace (whitespace) skip)
       (comment ("%" (arbno (not #\newline))) skip)
       (identifier
-       (letter (arbno (or letter digit "_" "-" "?")))
-       symbol)
+       (letter (arbno (or letter digit "_" "-" "?"))) symbol)
       (number (digit (arbno digit)) number)
       (number ("-" digit (arbno digit)) number)
+      (pred ((arbno (or "greater?" "less?" "equal?"))) symbol)
       ))
   
   (define the-grammar
     '((program (expression) a-program)
-
+      
       (expression (number) const-exp)
       (expression
         ("-" "(" expression "," expression ")")
@@ -31,7 +31,11 @@
       (expression
        ("zero?" "(" expression ")")
        zero?-exp)
-
+       
+      (expression
+       (pred "(" expression (arbno expression) ")")
+        bool-exp)
+      
       (expression
        ("if" expression "then" expression "else" expression)
        if-exp)
@@ -40,7 +44,7 @@
 
       (expression
        ("let" identifier "=" expression "in" expression)
-       let-exp)   
+       let-exp)
 
       ))
   

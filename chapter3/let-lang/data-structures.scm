@@ -10,9 +10,9 @@
 
   (define-datatype expval expval?
     (num-val
-      (value number?))
-    (bool-val
-      (boolean boolean?)))
+      (value number?)))
+;    (bool-val
+;      (boolean boolean?)))
 
 ;;; extractors:
 
@@ -26,11 +26,11 @@
 
   ;; expval->bool : ExpVal -> Bool
   ;; Page: 70
-  (define expval->bool
-    (lambda (v)
-      (cases expval v
-	(bool-val (bool) bool)
-	(else (expval-extractor-error 'bool v)))))
+;  (define expval->bool
+;    (lambda (v)
+;      (cases expval v
+;	(bool-val (bool) bool)
+;	(else (expval-extractor-error 'bool v)))))
 
   (define expval-extractor-error
     (lambda (variant value)
