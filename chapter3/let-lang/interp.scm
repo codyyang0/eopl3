@@ -67,6 +67,19 @@
               (value-of exp2 env)
               (value-of exp3 env))))
 
+        ;Exercise 3.12
+        (cond-exp (exp1s exp2s)
+          (if (null? exp1s)
+              (cond-exp-error)
+              (let ((pre-exp (car exp1s))
+                    (body-exp (car exp2s)))
+                (let ((val (value-of pre-exp env)))
+                  (if (expval->bool val)
+                      (value-of body-exp env)
+                      (let ((pre-exps (cdr exp1s))
+                            (body-exps (cdr exp2s)))
+                        (value-of (cond-exp pre-exps body-exps) env)))))))
+
         ;\commentbox{\ma{\theletspecsplit}}
         (let-exp (var exp1 body)       
           (let ((val1 (value-of exp1 env)))
@@ -158,6 +171,8 @@
                   (list-val val1 (value-of (list-exp saved-exps) env))))))
         )))
 
-
+      (define cond-exp-error
+        (lambda ()
+          (eopl:error 'cond-exp "evaluate error")))
   )
 

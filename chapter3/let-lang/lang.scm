@@ -16,7 +16,9 @@
       (identifier
        (letter (arbno (or letter digit "_" "-" "?")))
        symbol)
-      (oper (arbno (or "+" "-" "*" "/")) string)
+      (oper
+       ((arbno (or "+" "-" "*" "/")))
+       symbol)
       (number (digit (arbno digit)) number)
       (number ("-" digit (arbno digit)) number)
       ))
@@ -56,6 +58,11 @@
       (expression
        ("if" expression "then" expression "else" expression)
        if-exp)
+
+      ;Exercise 3.12
+      (expression
+       ("cond" (arbno expression "==>" expression) "end")
+       cond-exp)
 
       (expression (identifier) var-exp)
 
