@@ -5,7 +5,7 @@
 
   (require "data-structures.scm")
 
-  (provide init-env empty-env extend-env apply-env)
+  (provide init-env empty-env extend-env apply-env extend-env*)
 
 ;;;;;;;;;;;;;;;; initial environment ;;;;;;;;;;;;;;;;
   
@@ -39,6 +39,17 @@
   (define extend-env
     (lambda (sym val old-env)
       (extended-env-record sym val old-env)))
+
+  (define extend-env*
+    (lambda (syms vals old-env)
+      (if (null? syms)
+          old-env
+          (let ((sym (car syms))
+                (val (car vals))
+                (saved-syms (cdr syms))
+                (saved-vals (cdr vals)))
+            (let ((new-env (extend-env sym val old-env)))
+              (extend-env* saved-syms saved-vals new-env))))))
 
   (define apply-env
     (lambda (env search-sym)

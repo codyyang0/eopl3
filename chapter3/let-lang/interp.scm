@@ -83,12 +83,25 @@
 ;                            (body-exps (cdr exp2s)))
 ;                        (value-of (cond-exp pre-exps body-exps) env)))))))
 
+        ;Exercise 3.16
         ;\commentbox{\ma{\theletspecsplit}}
-        (let-exp (var exp1 body)       
-          (let ((val1 (value-of exp1 env)))
-            (value-of body
-              (extend-env var val1 env))))
+        (let-exp (vars exps body)
+          (let ((vals (map (lambda (e) (value-of e env)) exps)))
+            (let ((new-env (extend-env* vars vals env)))
+              (value-of body new-env))))
 
+        ;Exercise 3.17
+        (let*-exp (vars exps body)
+          (if (null? vars)
+              (value-of body env)
+              (let ((var (car vars))
+                    (exp (car exps))
+                    (saved-vars (cdr vars))
+                    (saved-exps (cdr exps)))
+                (let ((val (value-of exp env)))
+                  (let ((new-env (extend-env var val env)))
+                    (value-of (let*-exp saved-vars saved-exps body) new-env))))))
+           
         ;Exercise 3.6
         (minus-exp (exp1)
           (let ((val1 (value-of exp1 env)))

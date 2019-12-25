@@ -70,16 +70,21 @@
 ;       cond-exp)
 
       (expression (identifier) var-exp)
-
+      
+      ;Exercise 3.16
       (expression
-       ("let" identifier "=" expression "in" expression)
+       ("let" (arbno identifier "=" expression) "in" expression)
        let-exp)
+
+      ;Exercise 3.17
+      (expression
+       ("let*" (arbno identifier "=" expression) "in" expression)
+       let*-exp)
       
       ;Exercise 3.6 minus
       (expression
        ("minus" "(" expression ")")
        minus-exp)
-
 
       ))
   
