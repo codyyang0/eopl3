@@ -52,7 +52,7 @@
   ;; procedure : Var * Exp * Env -> Proc
   (define-datatype proc proc?
     (procedure
-      (var symbol?)
+      (vars (list-of symbol?))
       (body expression?)
       (env environment?)))
 

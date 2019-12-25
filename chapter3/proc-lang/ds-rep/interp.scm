@@ -35,15 +35,6 @@
         ;\commentbox{ (value-of (var-exp \x{}) \r) = (apply-env \r \x{})}
         (var-exp (var) (apply-env env var))
 
-        ;\commentbox{\diffspec}
-        (diff-exp (exp1 exp2)
-          (let ((val1 (value-of exp1 env))
-                (val2 (value-of exp2 env)))
-            (let ((num1 (expval->num val1))
-                  (num2 (expval->num val2)))
-              (num-val
-                (- num1 num2)))))
-
         ;\commentbox{\zerotestspec}
         (zero?-exp (exp1)
           (let ((val1 (value-of exp1 env)))
@@ -65,22 +56,36 @@
             (value-of body
               (extend-env var val1 env))))
         
-        (proc-exp (var body)
-          (proc-val (procedure var body env)))
+        (proc-exp (vars body)
+          (proc-val (procedure vars body env)))
 
-        (call-exp (rator rand)
+        (letproc-exp (func var body exps)
+          (let ((val (proc-val (procedure var body env))))
+            (let ((new-env (extend-env func val env)))
+              (value-of exps new-env))))
+
+        (call-exp (rator rands)
           (let ((proc (expval->proc (value-of rator env)))
-                (arg (value-of rand env)))
-            (apply-procedure proc arg)))
+                (args (map (lambda (rand) (value-of rand env))
+                           rands)))
+            (apply-procedure proc args)))
 
         )))
 
   ;; apply-procedure : Proc * ExpVal -> ExpVal
   ;; Page: 79
+  ;; Page: 80 -> Exercise 3.21
   (define apply-procedure
-    (lambda (proc1 val)
+    (lambda (proc1 vals)
       (cases proc proc1
-        (procedure (var body saved-env)
-          (value-of body (extend-env var val saved-env))))))
+        (procedure (vars body saved-env)
+          (if (null? vars)
+              (value-of body saved-env)
+              (let ((var (car vars))
+                    (val (car vals))
+                    (saved-vars (cdr vars))
+                    (saved-vals (cdr vals)))
+                (let ((new-env (extend-env var val saved-env)))
+                  (apply-procedure (procedure saved-vars body new-env) saved-vals))))))))
 
   )

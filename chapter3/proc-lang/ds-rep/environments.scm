@@ -50,4 +50,15 @@
 	    val
 	    (apply-env old-env search-sym))))))
 
+  ;Exercise 3.22 [***]
+  (define has-binding?
+    (lambda (env search-sym)
+      (if (empty-env? env)
+          #f
+          (let ((sym (extended-env-record->sym env))
+                (val (extended-env-record->val env))
+                (old-env (extended-env-record->old-env env)))
+	  (if (eqv? search-sym sym)
+	    #t
+	    (has-binding? old-env search-sym))))))
   )

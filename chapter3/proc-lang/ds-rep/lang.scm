@@ -22,9 +22,6 @@
     '((program (expression) a-program)
 
       (expression (number) const-exp)
-      (expression
-        ("-" "(" expression "," expression ")")
-        diff-exp)
       
       (expression
        ("zero?" "(" expression ")")
@@ -40,12 +37,18 @@
        ("let" identifier "=" expression "in" expression)
        let-exp)   
 
+      ;Exercise 3.21
       (expression
-       ("proc" "(" identifier ")" expression)
+       ("proc" "(" (separated-list identifier ",") ")" expression)
        proc-exp)
 
+      ;Exercise 3.19
       (expression
-       ("(" expression expression ")")
+       ("letproc" identifier "(" identifier ")" "{" expression "}" expression)
+       letproc-exp)
+
+      (expression
+       ("(" expression (arbno expression) ")")
        call-exp)
       
       ))
