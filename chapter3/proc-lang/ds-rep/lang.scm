@@ -11,10 +11,10 @@
   (define the-lexical-spec
     '((whitespace (whitespace) skip)
       (comment ("%" (arbno (not #\newline))) skip)
-      (identifier
-       ((or letter "+" "-" "*" "/")
-        (arbno (or letter digit "_" "-" "?")))
-       symbol)
+      [identifier
+       (letter (arbno (or letter digit "_" "-" "?")))
+       symbol]
+      [identifier [(or "+" "-" "*" "/")] symbol]
       (number (digit (arbno digit)) number)
       (number ("-" digit (arbno digit)) number)
       ))
@@ -36,7 +36,7 @@
 
       (expression
        ("let" identifier "=" expression "in" expression)
-       let-exp)   
+       let-exp)
 
       ;Exercise 3.21
       (expression
