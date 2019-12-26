@@ -16,7 +16,9 @@
     (bool-val
       (boolean boolean?))
     (proc-val 
-      (proc proc?)))
+      (proc proc?))
+    (builtin-func-val
+     (func procedure?)))
 
 ;;; extractors:
 
@@ -41,6 +43,22 @@
 	(proc-val (proc) proc)
 	(else (expval-extractor-error 'proc v)))))
 
+  ;; expval->builtin-func : ExpVal -> Procedure
+  (define expval->builtin-func
+    (lambda (v)
+      (cases expval v
+	(builtin-func-val (proc) proc)
+	(else (expval-extractor-error 'builtin-func v)))))
+   
+  ;; expval->bool : ExpVal -> Int | Bool | Proc
+  (define expval->base
+    (lambda (v)
+      (cases expval v
+        (num-val (num) num)
+        (bool-val (bool) bool)
+        (proc-val (proc) proc)
+        (builtin-func-val (proc) proc))))
+    
   (define expval-extractor-error
     (lambda (variant value)
       (eopl:error 'expval-extractors "Looking for a ~s, found ~s"
@@ -52,7 +70,7 @@
   ;; procedure : Var * Exp * Env -> Proc
   (define-datatype proc proc?
     (procedure
-      (vars (list-of symbol?))
+      (var (list-of symbol?))
       (body expression?)
       (env environment?)))
 

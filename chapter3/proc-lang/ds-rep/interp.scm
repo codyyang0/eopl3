@@ -64,16 +64,23 @@
             (let ((new-env (extend-env func val env)))
               (value-of exps new-env))))
 
+;        (call-exp (rator rands)
+;          (let ((proc (expval->proc (value-of rator env)))
+;                (args (map (lambda (rand) (value-of rand env))
+;                           rands)))
+;            (apply-procedure proc args)))
+        
         (call-exp (rator rands)
-          (let ((proc (expval->proc (value-of rator env)))
-                (args (map (lambda (rand) (value-of rand env))
-                           rands)))
-            (apply-procedure proc args)))
-
+          (let ((val (value-of rator env))
+                (args (map (lambda (rand) (value-of rand env)) rands)))
+            (cases expval val
+              (proc-val (proc) (apply-procedure proc args))
+              (builtin-func-val (func) (apply-builtin-func func args))
+              (else
+               (eopl:error 'call-exp "No binding for ~s" rator)))))
         )))
 
-  ;; apply-procedure : Proc * ExpVal -> ExpVal
-  ;; Page: 79
+
   ;; Page: 80 -> Exercise 3.21
   (define apply-procedure
     (lambda (proc1 vals)
@@ -88,4 +95,20 @@
                 (let ((new-env (extend-env var val saved-env)))
                   (apply-procedure (procedure saved-vars body new-env) saved-vals))))))))
 
+  ;; apply-procedure : Proc * ExpVal -> ExpVal
+  ;; Page: 79
+;  (define apply-procedure
+;    (lambda (proc1 val)
+;      (cases proc proc1
+;        (procedure (var body saved-env)
+;          (value-of body (extend-env var val saved-env))))))
+
+  ;; apply-builtin-func : builtin-func * ExpVal -> ExpVal
+  (define apply-builtin-func
+    (lambda (func1 vals)
+      (let ((exe (cons func1 (map (lambda (v) (expval->base v)) vals))))
+        (let ((result (eval exe)))
+          (if (number? result)
+              (num-val result)
+              (bool-val result))))))
   )
