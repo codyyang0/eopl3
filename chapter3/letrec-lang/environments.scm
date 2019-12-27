@@ -38,9 +38,27 @@
 	  (if (eqv? search-sym var)
 	    val
 	    (apply-env saved-env search-sym)))
-        (extend-env-rec (p-name b-var p-body saved-env)
+        ;Exercise 3.31
+        (extend-env* (vars vals saved-env)
+          (let ([ref (idx search-sym vars)])
+            (if ref
+                (list-ref vals ref)
+                (apply-env saved-env search-sym))))
+        (extend-env-rec (p-name b-vars p-body saved-env)
           (if (eqv? search-sym p-name)
-            (proc-val (procedure b-var p-body env))          
+            (proc-val (procedure b-vars p-body env)) 
             (apply-env saved-env search-sym))))))
-    
+
+  ;; Exercise 3.31
+  (define idx-aux
+    (lambda (sym lst i)
+      (if (null? lst)
+          #f
+          (if (eqv? sym (car lst))
+              i
+              (idx-aux sym (cdr lst) (+ i 1))))))
+  (define idx
+    (lambda (sym lst)
+      (idx-aux sym lst 0)))
+
   )
