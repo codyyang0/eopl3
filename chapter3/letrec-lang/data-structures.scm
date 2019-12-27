@@ -71,6 +71,12 @@
       (id symbol?)
       (bvars (list-of symbol?))
       (body expression?)
-      (saved-env environment?)))
+      (saved-env environment?))
+    ;Exercise 3.32
+    (extend-env-rec*
+     (id (list-of symbol?))
+     (lso-bvars (list-of (list-of symbol?)))
+     (bodys (list-of expression?))
+     (saved-env environment?)))
 
 )

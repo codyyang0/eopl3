@@ -47,7 +47,15 @@
         (extend-env-rec (p-name b-vars p-body saved-env)
           (if (eqv? search-sym p-name)
             (proc-val (procedure b-vars p-body env)) 
-            (apply-env saved-env search-sym))))))
+            (apply-env saved-env search-sym)))
+        (extend-env-rec* (p-names lso-b-vars p-bodys saved-env)
+          (let ([ref (idx search-sym p-names)])
+            (if ref
+                (let ([b-vars (list-ref lso-b-vars ref)]
+                      [p-body (list-ref p-bodys ref)])
+                  (proc-val (procedure b-vars p-body env)))
+                (apply-env saved-env search-sym))))
+        )))
 
   ;; Exercise 3.31
   (define idx-aux
