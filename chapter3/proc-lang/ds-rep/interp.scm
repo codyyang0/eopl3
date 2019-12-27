@@ -59,9 +59,16 @@
         (proc-exp (vars body)
           (let ([free-vars (remq* vars (vars-of-exp body))])
             (let ([free-vars-env (bind-vars-env free-vars env (empty-env))])
-              ;(eopl:printf "~s" free-vars-env)
               (proc-val (procedure vars body free-vars-env)))))
 
+        (traceproc-exp (vars body)
+          (begin
+            (eopl:printf "Creating a proc AST ~%")
+            (let ([val (value-of (proc-exp vars body) env)])
+              (eopl:printf "Created a proc AST ~%")
+              val)))
+
+        ;Exercise 3.27
         (letproc-exp (func var body exps)
           (let ((val (proc-val (procedure var body env))))
             (let ((new-env (extend-env func val env)))
@@ -76,6 +83,7 @@
         (call-exp (rator rands)
           (let ((val (value-of rator env))
                 (args (map (lambda (rand) (value-of rand env)) rands)))
+            ;(eopl:printf "~s~%" env)
             (cases expval val
               (proc-val (proc) (apply-procedure proc args))
               (builtin-func-val (func) (apply-builtin-func func args))
@@ -130,6 +138,8 @@
                              (vars-of-exp body)))]
         [proc-exp [vars body]
           (append vars (vars-of-exp body))]
+        [traceproc-exp [vars body]
+          (vars-of-exp (proc-exp vars body))]
         [letproc-exp [func var body exps]
           (list func var (append (vars-of-exp body)
                                  (vars-of-exp exps)))]
@@ -143,8 +153,7 @@
                           (let ([pre-vars (car vars)]
                                 [next-vars (cdr vars)])
                             (append pre-vars (all-vars next-vars)))))])
-               (all-vars (map vars rands))
-               )))]
+               (all-vars (map vars rands)))))]
         )))
                                  
 

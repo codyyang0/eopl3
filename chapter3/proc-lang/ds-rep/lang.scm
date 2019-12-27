@@ -43,6 +43,11 @@
        ("proc" "(" (separated-list identifier ",") ")" expression)
        proc-exp)
 
+      ;Exercise 3.27
+      (expression
+       ("traceproc" "(" (separated-list identifier ",") ")" expression)
+       traceproc-exp)
+
       ;Exercise 3.19
       (expression
        ("letproc" identifier "(" identifier ")" "{" expression "}" expression)
