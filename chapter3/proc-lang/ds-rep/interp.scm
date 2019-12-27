@@ -57,7 +57,10 @@
               (extend-env var val1 env))))
         
         (proc-exp (vars body)
-          (proc-val (procedure vars body env)))
+          (let ([free-vars (remq* vars (vars-of-exp body))])
+            (let ([free-vars-env (bind-vars-env free-vars env (empty-env))])
+              ;(eopl:printf "~s" free-vars-env)
+              (proc-val (procedure vars body free-vars-env)))))
 
         (letproc-exp (func var body exps)
           (let ((val (proc-val (procedure var body env))))
@@ -79,7 +82,6 @@
               (else
                (eopl:error 'call-exp "No binding for ~s" rator)))))
         )))
-
 
   ;; Page: 80 -> Exercise 3.21
   (define apply-procedure
@@ -111,4 +113,71 @@
           (if (number? result)
               (num-val result)
               (bool-val result))))))
+
+  (define vars-of-exp
+    (lambda (exp)
+      (cases expression exp
+        [const-exp [num] '()]
+        [var-exp [var] (list var)]
+        [zero?-exp [exp1] (vars-of-exp exp1)]
+        [if-exp [exp1 exp2 exp3]
+          (append
+           (vars-of-exp exp1)
+           (vars-of-exp exp2)
+           (vars-of-exp exp3))]
+        [let-exp [var exp1 body]
+           (cons var (append (vars-of-exp exp1)
+                             (vars-of-exp body)))]
+        [proc-exp [vars body]
+          (append vars (vars-of-exp body))]
+        [letproc-exp [func var body exps]
+          (list func var (append (vars-of-exp body)
+                                 (vars-of-exp exps)))]
+        [call-exp (rator rands)
+          (let ([vars (lambda (v) (vars-of-exp v))])
+            (append
+             (vars-of-exp rator)
+             (letrec ([all-vars
+                    (lambda (vars)
+                      (if (null? vars) '()
+                          (let ([pre-vars (car vars)]
+                                [next-vars (cdr vars)])
+                            (append pre-vars (all-vars next-vars)))))])
+               (all-vars (map vars rands))
+               )))]
+        )))
+                                 
+
+  (define vars-of-program
+    (lambda [pgm]
+      (cases program pgm
+        [a-program (exp1) (vars-of-exp exp1)])))
+  
+  (define remq
+    (lambda [sym lst]
+      (if (null? lst)
+          '()
+          (if (eqv? sym (car lst))
+              (remq sym (cdr lst))
+              (cons (car lst) (remq sym (cdr lst)))))))
+  
+  (define remq*
+    (lambda [lst1 lst2]
+      (if (null? lst1)
+          lst2
+          (let ([rs (car lst1)]
+                [s-rs (cdr lst1)])
+            (let ([sl (remq rs lst2)])
+              (remq* s-rs sl))))))
+
+  ;; free-vars : expression -> lst
+;  (define free-vars
+;    (lambda (exp)
+;      (cases expression
+;        (const-exp (num) '())
+;        (var-exp (var) (list var))
+;        (zero?-exp (exp1) (free-vars exp1))
+;        (if-exp (exp1 exp2 exp3)
+            
+      
   )

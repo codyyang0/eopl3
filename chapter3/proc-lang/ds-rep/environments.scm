@@ -5,7 +5,7 @@
 
   (require "data-structures.scm")
 
-  (provide init-env empty-env extend-env apply-env)
+  (provide init-env empty-env extend-env apply-env bind-vars-env)
 
 ;;;;;;;;;;;;;;;; initial environment ;;;;;;;;;;;;;;;;
 
@@ -50,5 +50,27 @@
 	  (if (eqv? search-sym sym)
 	    val
 	    (apply-env old-env search-sym))))))
+
+  ;Exercise 3.26
+  (define has-binding?
+    (lambda (env search-sym)
+      (if (empty-env? env)
+          #f
+          (let ((sym (extended-env-record->sym env))
+                (old-env (extended-env-record->old-env env)))
+            (if (eqv? sym search-sym)
+                #t
+                (has-binding? old-env search-sym))))))
+  
+  (define bind-vars-env
+    (lambda (vars env free-env)
+      (if (null? vars)
+          free-env
+          (let ((var (car vars))
+                (saved-vars (cdr vars)))
+            (if (has-binding? env var)
+                (let ((new-env (extend-env var (apply-env env var) free-env)))
+                  (bind-vars-env saved-vars env new-env))
+                (bind-vars-env saved-vars env free-env))))))
 
   )

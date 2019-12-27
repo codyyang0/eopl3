@@ -57,22 +57,22 @@
   ;; (run-all)
 
   ;; Exercise 3.24
-  (run "
-let odd = proc (f1)
-            proc (f2)
-	           proc (x)
-	             if zero?(x) then 0
-	             else
-	               (((f2 f2) f1) (- x 1))
-  in let even = proc (f1)
-                  proc (f2)
-	                  proc (x)
-	                    if zero?(x) then 1
-	                    else (((f2 f2) f1) (- x 1))
-     in let even? = proc (x) (((even even) odd) x)
-       in let odd? = proc (x) (((odd odd) even) x)
-         in (odd? 3)
-")
+;  (run "
+;let odd = proc (f1)
+;            proc (f2)
+;	           proc (x)
+;	             if zero?(x) then 0
+;	             else
+;	               (((f2 f2) f1) (- x 1))
+;  in let even = proc (f1)
+;                  proc (f2)
+;	                  proc (x)
+;	                    if zero?(x) then 1
+;	                    else (((f2 f2) f1) (- x 1))
+;     in let even? = proc (x) (((even even) odd) x)
+;       in let odd? = proc (x) (((odd odd) even) x)
+;         in (odd? 3)
+;")
   
   )
 
