@@ -52,12 +52,10 @@
            (if (eqv? search-sym p-name)
                (vector-ref vec 0)
                (apply-env saved-env search-sym)))
-        (extend-env-rec* (p-names lso-b-vars p-bodys saved-env)
+        (extend-env-rec* (p-names vec saved-env)
           (let ([ref (idx search-sym p-names)])
             (if ref
-                (let ([b-vars (list-ref lso-b-vars ref)]
-                      [p-body (list-ref p-bodys ref)])
-                  (proc-val (procedure b-vars p-body env)))
+                (vector-ref vec ref)
                 (apply-env saved-env search-sym))))
         )))
 

@@ -72,18 +72,26 @@
                 (args (map (lambda (rand) (value-of rand env)) rands)))
             (apply-procedure proc args)))
 
-        (letrec-exp (p-name b-vars p-body letrec-body)
-          ;Exercise 3.35, very interesting solution
-          (let ([vec (make-vector 1)])
-            (let ([rec-env (extend-env-rec p-name vec env)])
-              (let ([val (proc-val (procedure b-vars p-body rec-env))])
-                (vector-set! vec 0 val)
-                (value-of letrec-body rec-env)))))
+;        (letrec-exp (p-name b-vars p-body letrec-body)
+;          ;Exercise 3.35, very interesting solution
+;          (let ([vec (make-vector 1)])
+;            (let ([rec-env (extend-env-rec p-name vec env)])
+;              (let ([val (proc-val (procedure b-vars p-body rec-env))])
+;                (vector-set! vec 0 val)
+;                (value-of letrec-body rec-env)))))
 
         ;Exercise 3.32
 ;        (letrec-exp (p-names lso-b-vars p-bodys letrec-body)
 ;          (value-of letrec-body
-;            (extend-env-rec* p-names lso-b-vars p-bodys env)))           
+;            (extend-env-rec* p-names lso-b-vars p-bodys env)))
+
+        ;Exercise 3.36
+        (letrec-exp (p-names lso-b-vars p-bodys letrec-body)
+          (let ([len (length p-names)])
+            (let ([vec (make-vector len)])
+              (let ([rec-env (extend-env-rec* p-names vec env)])
+                (let ([new-env (build-env p-names lso-b-vars p-bodys vec rec-env len)])
+                  (value-of letrec-body rec-env))))))
 
         )))
 
@@ -94,6 +102,16 @@
         (procedure (vars body saved-env)
           ;Exercise 3.31
           (value-of body (extend-env* vars args saved-env))))))
+
+    (define build-env
+      (lambda (p-names lso-b-vars p-bodys vec rec-env i)
+        (if (zero? i)
+            (eopl:printf "rec-env contructed'")
+            (let ([b-vars (list-ref lso-b-vars i)]
+                  [p-body (list-ref p-bodys i)])
+              (let ([val (proc-val (procedure b-vars p-body rec-env))])
+                (vector-set! vec i val)
+                (build-env p-names lso-b-vars p-bodys vec rec-env (- i 1)))))))
   
   )
   

@@ -79,8 +79,7 @@
     ;Exercise 3.32
     (extend-env-rec*
      (id (list-of symbol?))
-     (lso-bvars (list-of (list-of symbol?)))
-     (bodys (list-of expression?))
+     (vec vector?)
      (saved-env environment?)))
 
   ;Exercise 3.34 [***] Implement extend-env-rec in the procedural representation
