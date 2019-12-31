@@ -72,14 +72,18 @@
                 (args (map (lambda (rand) (value-of rand env)) rands)))
             (apply-procedure proc args)))
 
-;        (letrec-exp (p-name b-vars p-body letrec-body)
-;          (value-of letrec-body
-;            (extend-env-rec p-name b-vars p-body env)))
+        (letrec-exp (p-name b-vars p-body letrec-body)
+          ;Exercise 3.35, very interesting solution
+          (let ([vec (make-vector 1)])
+            (let ([rec-env (extend-env-rec p-name vec env)])
+              (let ([val (proc-val (procedure b-vars p-body rec-env))])
+                (vector-set! vec 0 val)
+                (value-of letrec-body rec-env)))))
 
         ;Exercise 3.32
-        (letrec-exp (p-names lso-b-vars p-bodys letrec-body)
-          (value-of letrec-body
-            (extend-env-rec* p-names lso-b-vars p-bodys env)))
+;        (letrec-exp (p-names lso-b-vars p-bodys letrec-body)
+;          (value-of letrec-body
+;            (extend-env-rec* p-names lso-b-vars p-bodys env)))           
 
         )))
 

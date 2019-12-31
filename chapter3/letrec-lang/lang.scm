@@ -48,11 +48,15 @@
        ("(" expression (arbno expression) ")")
        call-exp)
 
+;      (expression
+;        ("letrec"
+;          (arbno identifier "(" (separated-list identifier ",") ")" "=" expression)
+;           "in" expression)
+;        letrec-exp)
+
       (expression
-        ("letrec"
-          (arbno identifier "(" (separated-list identifier ",") ")" "=" expression)
-           "in" expression)
-        letrec-exp)
+       ("letrec" identifier "(" (separated-list identifier ",") ")" "=" expression "in" expression)
+       letrec-exp)
       
       ))
   

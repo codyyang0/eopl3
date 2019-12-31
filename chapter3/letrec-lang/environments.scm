@@ -5,7 +5,7 @@
 
   (require "data-structures.scm")
 
-  (provide init-env empty-env extend-env)
+  (provide init-env empty-env extend-env apply-env)
 
 ;;;;;;;;;;;;;;;; initial environment ;;;;;;;;;;;;;;;;
   
@@ -29,44 +29,48 @@
 ;;;;;;;;;;;;;;;; environment constructors and observers ;;;;;;;;;;;;;;;;
 
   ;; Page: 86
-;  (define apply-env
-;    (lambda (env search-sym)
-;      (cases environment env
-;        (empty-env ()
-;          (eopl:error 'apply-env "No binding for ~s" search-sym))
-;        (extend-env (var val saved-env)
-;	  (if (eqv? search-sym var)
-;	    val
-;	    (apply-env saved-env search-sym)))
-;        ;Exercise 3.31
-;        (extend-env* (vars vals saved-env)
-;          (let ([ref (idx search-sym vars)])
-;            (if ref
-;                (list-ref vals ref)
-;                (apply-env saved-env search-sym))))
+  (define apply-env
+    (lambda (env search-sym)
+      (cases environment env
+        (empty-env ()
+          (eopl:error 'apply-env "No binding for ~s" search-sym))
+        (extend-env (var val saved-env)
+	  (if (eqv? search-sym var)
+	    val
+	    (apply-env saved-env search-sym)))
+        ;Exercise 3.31
+        (extend-env* (vars vals saved-env)
+          (let ([ref (idx search-sym vars)])
+            (if ref
+                (list-ref vals ref)
+                (apply-env saved-env search-sym))))
 ;        (extend-env-rec (p-name b-vars p-body saved-env)
 ;          (if (eqv? search-sym p-name)
 ;            (proc-val (procedure b-vars p-body env)) 
 ;            (apply-env saved-env search-sym)))
-;        (extend-env-rec* (p-names lso-b-vars p-bodys saved-env)
-;          (let ([ref (idx search-sym p-names)])
-;            (if ref
-;                (let ([b-vars (list-ref lso-b-vars ref)]
-;                      [p-body (list-ref p-bodys ref)])
-;                  (proc-val (procedure b-vars p-body env)))
-;                (apply-env saved-env search-sym))))
-;        )))
+        (extend-env-rec (p-name vec saved-env)
+           (if (eqv? search-sym p-name)
+               (vector-ref vec 0)
+               (apply-env saved-env search-sym)))
+        (extend-env-rec* (p-names lso-b-vars p-bodys saved-env)
+          (let ([ref (idx search-sym p-names)])
+            (if ref
+                (let ([b-vars (list-ref lso-b-vars ref)]
+                      [p-body (list-ref p-bodys ref)])
+                  (proc-val (procedure b-vars p-body env)))
+                (apply-env saved-env search-sym))))
+        )))
 
   ;; Exercise 3.31
-;  (define idx-aux
-;    (lambda (sym lst i)
-;      (if (null? lst)
-;          #f
-;          (if (eqv? sym (car lst))
-;              i
-;              (idx-aux sym (cdr lst) (+ i 1))))))
-;  (define idx
-;    (lambda (sym lst)
-;      (idx-aux sym lst 0)))
+  (define idx-aux
+    (lambda (sym lst i)
+      (if (null? lst)
+          #f
+          (if (eqv? sym (car lst))
+              i
+              (idx-aux sym (cdr lst) (+ i 1))))))
+  (define idx
+    (lambda (sym lst)
+      (idx-aux sym lst 0)))
 
   )
