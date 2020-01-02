@@ -72,10 +72,10 @@
 ;      (bvars (list-of symbol?))
 ;      (body expression?)
 ;      (saved-env environment?))
-    (extend-env-rec
-     (id symbol?)
-     (vec vector?)
-     (saved-env environment?))
+;    (extend-env-rec
+;     (id symbol?)
+;     (vec vector?)
+;     (saved-env environment?))
     ;Exercise 3.32
     (extend-env-rec*
      (id (list-of symbol?))

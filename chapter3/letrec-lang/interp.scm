@@ -70,6 +70,7 @@
         (call-exp (rator rands)
           (let ((proc (expval->proc (value-of rator env)))
                 (args (map (lambda (rand) (value-of rand env)) rands)))
+            ;(eopl:printf "~s ~s ~%" proc args)
             (apply-procedure proc args)))
 
 ;        (letrec-exp (p-name b-vars p-body letrec-body)
@@ -101,17 +102,20 @@
       (cases proc proc1
         (procedure (vars body saved-env)
           ;Exercise 3.31
+          ;(eopl:printf "~s~%" args)
           (value-of body (extend-env* vars args saved-env))))))
 
     (define build-env
       (lambda (p-names lso-b-vars p-bodys vec rec-env i)
         (if (zero? i)
-            (eopl:printf "rec-env contructed'")
-            (let ([b-vars (list-ref lso-b-vars i)]
-                  [p-body (list-ref p-bodys i)])
-              (let ([val (proc-val (procedure b-vars p-body rec-env))])
-                (vector-set! vec i val)
-                (build-env p-names lso-b-vars p-bodys vec rec-env (- i 1)))))))
+            (eopl:printf "rec-env contructed~%")
+            (let ([idx (- i 1)])
+              (let ([b-vars (list-ref lso-b-vars idx)]
+                    [p-body (list-ref p-bodys idx)])
+                (let ([val (proc-val (procedure b-vars p-body rec-env))])
+                  (vector-set! vec idx val)
+                  ;(eopl:printf "~s~%" (vector-ref vec idx))
+                  (build-env p-names lso-b-vars p-bodys vec rec-env (- i 1))))))))
   
   )
   
