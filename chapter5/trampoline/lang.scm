@@ -1,7 +1,7 @@
 (module lang (lib "eopl.ss" "eopl")                
-
-  ;; language for EXPLICIT-REFS
   
+  ;; grammar for the LETREC language
+
   (require "drscheme-init.scm")
   
   (provide (all-defined-out))
@@ -38,7 +38,7 @@
 
       (expression
        ("let" identifier "=" expression "in" expression)
-       let-exp)   
+       let-exp)
 
       (expression
        ("proc" "(" identifier ")" expression)
@@ -50,27 +50,9 @@
 
       (expression
         ("letrec"
-          (arbno identifier "(" identifier ")" "=" expression)
+          identifier "(" identifier ")" "=" expression
            "in" expression)
         letrec-exp)
-      
-      ;; new for explicit-refs
-      (expression
-        ("begin" expression (arbno ";" expression) "end")
-        begin-exp)
-
-      (expression
-        ("newref" "(" expression ")")
-        newref-exp)
-
-      (expression
-        ("deref" "(" expression ")")
-        deref-exp)
-
-      (expression
-        ("setref" "(" expression "," expression ")")
-        setref-exp)
-
       ))
 
   ;;;;;;;;;;;;;;;; sllgen boilerplate ;;;;;;;;;;;;;;;;
